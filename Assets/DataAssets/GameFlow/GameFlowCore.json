@@ -1,0 +1,76 @@
+{
+    "LevelFlow": {
+        "Id": "MainGameFlow",
+        "Flow": [
+            {
+                "Id": "StartFramework",
+                "Loopable": false,
+                "Actions": [
+                    {
+                        "TriggerConditions": [],
+                        "ResultToExecute": [
+                            {
+                                "ClassName": "LoadCoreSceneInstruction",
+                                "ParametersToParse": [
+                                    "Number, 1",
+                                    "SceneName, CoreInitScene",
+                                    "Bootstrap, JsonActions/ActionsBoot",
+                                    "NextFlowAction, FlowBootScene",
+                                    "FlowToExecute, None"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "Id": "FlowBootScene",
+                "Loopable": false,
+                "Actions": [
+                    {
+                        "TriggerConditions": [],
+                        "ResultToExecute": [
+                            {
+                                "ClassName": "LoadSceneInstruction",
+                                "ParametersToParse": [
+                                    "Number, 1",
+                                    "SceneName, PublisherScene",
+                                    "UnityScene, PublisherSceneUnity",
+                                    "NextFlowAction, FlowPublisherSceneLoaded",
+                                    "Bootstrap, JsonActions/ActionsPublisher",
+                                    "FlowToExecute, None"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "Id": "FlowPublisherSceneLoaded",
+                "Loopable": false,
+                "Actions": [
+                    {
+                        "TriggerConditions": [],
+                        "ResultToExecute": [
+                            {
+                                "ClassName": "CheckSceneToLoadInstruction",
+                                "ParametersToParse": [
+                                    "Number, 1",
+                                    "TotalScenes, 2",
+                                    "SceneName1, MenuScene",
+                                    "SceneName2, MenuSceneTutorial",
+                                    "Bootstrap1, JsonActions/ActionsMenu",
+                                    "Bootstrap2, JsonActions/ActionsMenu",
+                                    "UnityScene1, MenuSceneUnity",
+                                    "UnityScene2, MenuSceneTutorialUnity",
+                                    "FlowToExecute, None"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+            
+        ]
+    }
+}

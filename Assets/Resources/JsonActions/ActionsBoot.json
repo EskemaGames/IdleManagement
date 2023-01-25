@@ -1,0 +1,53 @@
+{
+	"actionsList": [
+		{
+			"waitForCompletion": true,
+			"name": "ActionLoadLanguageCSV"
+		},
+		{
+			"waitForCompletion": true,
+			"name": "ActionInitGamepads",
+			"dependencies": [
+				{
+					"name": "ActionLoadLanguageCSV"
+				}
+			]
+		},
+		{
+			"waitForCompletion": true,
+			"name": "ActionAudioPool",
+			"dependencies": [
+				{
+					"name": "ActionInitGamepads"
+				}
+			]
+		},
+		{
+			"waitForCompletion": true,
+			"name": "ActionInitScreenController",
+			"dependencies": [
+				{
+					"name": "ActionAudioPool"
+				}
+			]
+		},
+		{
+			"waitForCompletion": true,
+			"name": "ActionInitGamepadDisconnection",
+			"dependencies": [
+				{
+					"name": "ActionInitScreenController"
+				}
+			]
+		},
+		{
+			"waitForCompletion": true,
+			"name": "ActionInitAchievementsCore",
+			"dependencies": [
+				{
+					"name": "ActionInitGamepadDisconnection"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,270 @@
+﻿{
+  "AllAttributes":[
+    {
+      "Type" : "Slave",
+      "Attributes": [
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "FormulaType": "Addition",
+          "AttributeName": "FoodAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 80.0,
+          "FormulaType": "Addition",
+          "AttributeName": "AgeAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 1.0,
+          "FormulaType": "Addition",
+          "AttributeName": "MaleAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 1.0,
+          "FormulaType": "Addition",
+          "AttributeName": "HealthAttr"
+        },
+        {
+          "Value": 2.0,
+          "MinValue": 1.0,
+          "MaxValue": 10.0,
+          "FormulaType": "Addition",
+          "AttributeName": "WorkTimeAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "AttackAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "DefenseAttr"
+        }
+      ],
+      "Works": [
+        {
+          "WorkAction": "Plant"
+        }
+      ],
+      "Components": [
+        {
+          "ClassName": "WorkComponentLogic",
+          "ClassName": "IdleComponentLogic"
+          
+        }
+      ]
+    },
+    {
+      "Type" : "Farmer",
+      "Attributes": [
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "FormulaType": "Addition",
+          "AttributeName": "FoodAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "SalaryAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "FormulaType": "Addition",
+          "AttributeName": "AgeAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 1.0,
+          "FormulaType": "Addition",
+          "AttributeName": "FemaleAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 1.0,
+          "FormulaType": "Addition",
+          "AttributeName": "HealthAttr"
+        },
+        {
+          "Value": 2.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "FormulaType": "Addition",
+          "AttributeName": "WorkTimeAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "AttackAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "DefenseAttr"
+        }
+      ],
+      "Components": [
+        {
+          "ClassName": "WorkComponentLogic"
+        }
+      ]
+    },
+    {
+      "Type" : "Merchant",
+      "Attributes": [
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "FormulaType": "Addition",
+          "AttributeName": "FoodAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "SalaryAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "FormulaType": "Addition",
+          "AttributeName": "AgeAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 10.0,
+          "FormulaType": "Addition",
+          "AttributeName": "MovementSpeedAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 1.0,
+          "FormulaType": "Addition",
+          "AttributeName": "FemaleAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 1.0,
+          "FormulaType": "Addition",
+          "AttributeName": "HealthAttr"
+        },
+        {
+          "Value": 2.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "FormulaType": "Addition",
+          "AttributeName": "WorkTimeAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "AttackAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 2.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "DefenseAttr"
+        }
+      ],
+      "Components": [
+        {
+          "ClassName": "WorkComponentLogic"
+        },
+        {
+          "ClassName": "TravelComponentLogic"
+        },
+        {
+          "ClassName": "MerchantComponentLogic"
+        }
+      ]
+    }
+    
+    
+    
+    ]
+}
+
+    
+
+

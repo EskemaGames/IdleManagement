@@ -83,7 +83,7 @@ namespace EG
                     EntityLogicData entity = buildingLogicData.GetEntityByPosition(i);
                     
                     WorkComponentLogic component = entity.GetLogicComponent<WorkComponentLogic>();
-
+                    
                     component?.Start(
                         aDays,
                         aDelayDays,
@@ -96,14 +96,30 @@ namespace EG
 
             private void OnCompleteComponentAction(uint anEntityId)
             {
+                var entity = buildingLogicData.GetEntity(anEntityId);
+
+                if (entity == null)
+                {
+                    onComponentCompletedAction?.Invoke(anEntityId);
+                    return;
+                }
+                
+                PaymentsComponentLogic paymentsComponent = entity.GetLogicComponent<PaymentsComponentLogic>();
+
+                if (paymentsComponent != null)
+                {
+                    uint cost = (uint)entity.GetAttributeValue(Attribute_Enums.AttributeType.SalaryAttr);
+                    
+                    WorkComponentLogic component = entity.GetLogicComponent<WorkComponentLogic>();
+                    
+                    cost *= component.GetCurrentTimeToWorkAmount;
+                    
+                    paymentsComponent.SetTotalPayments(cost);
+                }
+                
                 onComponentCompletedAction?.Invoke(anEntityId);
                 
-                var entity = buildingLogicData.GetEntity(anEntityId);
-                
-                if (entity != null)
-                {
-                    ResetWorks(entity);
-                }
+                ResetWorks(entity);
             }
 
             

@@ -119,16 +119,6 @@ namespace EG
                 currentTimeToWorkAmount += workData.TimeToWorkAmount;
                 currentResultAmount += workData.ResultFromWork;
                 currentResultItemAmount += workData.Item.Amount;
-
-                PaymentsComponentLogic paymentsComponent = entityLogicData.GetLogicComponent<PaymentsComponentLogic>();
-
-                if (paymentsComponent != null)
-                {
-                    uint cost = (uint)entityLogicData.GetAttributeValue(Attribute_Enums.AttributeType.SalaryAttr);
-                    cost *= currentTimeToWorkAmount;
-                    
-                    paymentsComponent.SetTotalPayments(cost);
-                }
                 
                 onComponentCompletedAction?.Invoke(entityId);
             }

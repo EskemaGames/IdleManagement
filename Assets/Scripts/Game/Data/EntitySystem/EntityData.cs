@@ -20,7 +20,7 @@ namespace EG
             [SerializeField] private uint uniqueId = 0;
             [SerializeField] private List<BaseComponentLogic> components = new List<BaseComponentLogic>();
             [SerializeField] private List<BaseAttribute> attributes = new List<BaseAttribute>();
-            [SerializeField] private EntityState currentState = null;
+            [SerializeField] private EntityState currentState = new EntityState();
             
             public string GetClassName => className;
             public GameEnums.EntityType GetNameId => nameId;
@@ -82,14 +82,6 @@ namespace EG
             #endregion
 
 
-            #region public API
-
-            public void SetEntityState(EntityState anState)
-            {
-                currentState = anState;
-            }
-            
-            #endregion
 
         }
 

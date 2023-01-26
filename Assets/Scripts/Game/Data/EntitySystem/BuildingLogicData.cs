@@ -26,8 +26,7 @@ namespace EG
             
             public ReadOnlyCollection<BaseComponentLogic> GetComponentsLogic => logicComponents.AsReadOnly();
 
-            
-            
+
             #region constructor
 
             public BuildingLogicData(){}
@@ -110,20 +109,6 @@ namespace EG
             
             public GameEnums.EntityType GetNameId => entityData.GetNameId;
 
-            public BaseComponentLogic GetComponent(Type aComponentType)
-            {
-                for (var i = 0; i < logicComponents.Count; ++i)
-                {
-                    BaseComponentLogic component = logicComponents[i];
-                    if (component.GetType() == aComponentType)
-                    {
-                        return component;
-                    }
-                }
-
-                return null;
-            }
-
             public EntityLogicData GetEntity(uint anId, out int anArrayPosition)
             {
                 for (var i = 0; i < entitiesLogicData.Count; ++i)
@@ -165,6 +150,8 @@ namespace EG
 
                 entitiesLogicData.RemoveAt(anArrayPosition);
             }
+
+            public int GetTotalEntities => entitiesLogicData.Count;
             
             #endregion
 
@@ -225,15 +212,11 @@ namespace EG
                 
                 entitiesLogicData.RemoveAt(anArrayPosition);
             }
-
-            public void SetData(params object[] args)
-            {
-                for (var i = 0; i < logicComponents.Count; ++i)
-                {
-                    BaseComponentLogic component = logicComponents[i];
-                    component.SetData(args);
-                } 
-            }
+            
+            #endregion
+            
+            
+            #region using building API
             
             public void SetData(IWorkData aWorkData)
             {
@@ -247,15 +230,22 @@ namespace EG
             public void Start(float aDays,
                 float aDelayDays,
                 System.Action<float, float> anUpdateProgress,
-                System.Action<float, float> anUpdateDelayProgress)
+                System.Action<float, float> anUpdateDelayProgress,
+                System.Action<uint> onCompleteEntity)
             {
                 for (var i = 0; i < logicComponents.Count; ++i)
                 {
                     BaseComponentLogic component = logicComponents[i];
-                    component.Start(aDays, aDelayDays, anUpdateProgress, anUpdateDelayProgress);
-                } 
-            }
 
+                    component.Start(
+                        aDays,
+                        aDelayDays,
+                        anUpdateProgress,
+                        anUpdateDelayProgress,
+                        onCompleteEntity);
+                }
+            }
+            
             #endregion
 
 
@@ -263,12 +253,6 @@ namespace EG
 
             public void OnUpdate(float aDeltaTime)
             {
-                for (var i = 0; i < logicComponents.Count; ++i)
-                {
-                    BaseComponentLogic component = logicComponents[i];
-                    component.Update(aDeltaTime);
-                }
-                
                 for (var i = 0; i < entitiesLogicData.Count; ++i)
                 {
                     EntityLogicData entity = entitiesLogicData[i];
@@ -322,16 +306,29 @@ namespace EG
                 if (totalDaysPassedPayments >= paymentDay)
                 {
                     totalDaysPassedPayments = 0;
+
+                    PaymentsComponentLogic paymentsComponent = GetLogicComponent<PaymentsComponentLogic>();
                     
-                    //TODO set payment on pay component
+                    paymentsComponent?.SetTotalPayments(0);
+
                 }
             }
 
-            private void CheckFoodConsumed() { }
 
-            private void CheckFoodProduced() { }
+            private T GetLogicComponent<T>() where T : BaseComponentLogic
+            {
+                for (int i = 0, max = logicComponents.Count; i < max; ++i)
+                {
+                    BaseComponentLogic component = logicComponents[i];
+                    if (component is T)
+                    {
+                        return component as T;
+                    }
+                }
+
+                return null;
+            }
             
-            private void CheckItemsProduced(){}
         }
 
     }

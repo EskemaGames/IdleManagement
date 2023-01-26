@@ -13,23 +13,21 @@ namespace EG
         public class WorkComponentLogic : BaseComponentLogic
         {
             
-            private EntityState state = new EntityState();
+
             private EntityLogicData entityLogicData = null;
-            private uint currentWorkAmount = 0;
+            private uint currentTimeToWorkAmount = 0;
             private uint currentResultAmount = 0;
             private uint currentResultItemAmount = 0;
             private IWorkData workData = null;
             
             private System.Action<uint> onComponentCompletedAction = null;
 
-            public uint GetCurrentWorkAmount => currentWorkAmount;
+            public uint GetCurrentTimeToWorkAmount => currentTimeToWorkAmount;
             public uint GetCurrentResultAmount => currentResultAmount;
             public uint GetCurrentResultItemAmount => currentResultItemAmount;
 
-            public bool IsWorking()
-            {
-                return workData != null ? true : false;
-            }
+            
+  
 
             
             #region init component
@@ -61,24 +59,13 @@ namespace EG
             {
                 onComponentCompletedAction = null;
                 entityLogicData?.Destroy();
-                state?.Destroy();
+                workData?.Reset();
             }
             
             #endregion
 
             
             #region data
-
-            public override void SetData(params object[] args)
-            {
-                for (var i = 0; i < args.Length; ++i)
-                {
-                    if (args[i] is System.Action<uint>)
-                    {
-                        onComponentCompletedAction = (System.Action<uint>) args[i];
-                    }
-                }
-            }
             
             public override void SetData(IWorkData aWorkData)
             {
@@ -95,10 +82,10 @@ namespace EG
             public override void Update(float aDeltaTime = 0)
             {
                 if (!canExecuteComponent) return;
-
-                state.OnUpdate(aDeltaTime);
+                
+                entityLogicData?.GetState.OnUpdate(aDeltaTime);
             }
-            
+
             #endregion
             
 
@@ -113,42 +100,35 @@ namespace EG
             public override void Start(float aDays,
                 float aDelayDays,
                 System.Action<float, float> anUpdateProgress,
-                System.Action<float, float> anUpdateDelayProgress)
+                System.Action<float, float> anUpdateDelayProgress,
+                System.Action<uint> onComplete)
             {
                 if (entityLogicData.IsBusy) return;
                 
                 if (IsWorking()) return;
-                
-                entityLogicData.SetState(state);
-                
-                state.Init(aDays, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteComponentAction);
-            }
-            
-            public override void Start(IWorkData aWorkData,
-                float aDays,
-                float aDelayDays,
-                System.Action<float, float> anUpdateProgress,
-                System.Action<float, float> anUpdateDelayProgress)
-            {
-                if (entityLogicData.IsBusy) return;
-                
-                CheckCurrentWorkToResetIfDataChanged(aWorkData);
 
-                workData = aWorkData;
+                onComponentCompletedAction = onComplete;
                 
-                entityLogicData.SetState(state);
-                
-                state.Init(aDays, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteComponentAction);
+                entityLogicData.GetState.Init(aDays, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteComponentAction);
             }
 
             private void OnCompleteComponentAction()
             {
-                state.OnCancelUpdate();
-                entityLogicData.SetState(state);
-
-                currentResultItemAmount += workData.Item.Amount;
+                entityLogicData.GetState.OnCancelUpdate();
+   
+                currentTimeToWorkAmount += workData.TimeToWorkAmount;
                 currentResultAmount += workData.ResultFromWork;
-                currentWorkAmount += workData.Item.Amount;
+                currentResultItemAmount += workData.Item.Amount;
+
+                PaymentsComponentLogic paymentsComponent = entityLogicData.GetLogicComponent<PaymentsComponentLogic>();
+
+                if (paymentsComponent != null)
+                {
+                    uint cost = (uint)entityLogicData.GetAttributeValue(Attribute_Enums.AttributeType.SalaryAttr);
+                    cost *= currentTimeToWorkAmount;
+                    
+                    paymentsComponent.SetTotalPayments(cost);
+                }
                 
                 onComponentCompletedAction?.Invoke(entityId);
             }
@@ -162,6 +142,9 @@ namespace EG
             }
 
 
+            
+            #region private misc 
+            
             private void CheckCurrentWorkToResetIfDataChanged(IWorkData aData)
             {
                 if (workData == null) return;
@@ -170,8 +153,15 @@ namespace EG
                 {
                     workData.Reset();
                 }
-                
             }
+            
+            private bool IsWorking()
+            {
+                return workData != null;
+            }
+            
+            #endregion
+             
         }
 
     }

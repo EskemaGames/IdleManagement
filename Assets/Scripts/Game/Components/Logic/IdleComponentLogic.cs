@@ -8,8 +8,7 @@ namespace EG
 
         public class IdleComponentLogic : BaseComponentLogic
         {
-
-            private EntityState state = new EntityState();
+            
             private EntityLogicData entityLogicData = null;
             private System.Action<uint> onComponentCompletedAction = null;
 
@@ -24,39 +23,10 @@ namespace EG
             }
 
             #endregion
-
-
-            public override void SetData(params object[] args)
-            {
-                for (var i = 0; i < args.Length; ++i)
-                {
-                    if (args[i] is System.Action<uint>)
-                    {
-                        onComponentCompletedAction = (System.Action<uint>) args[i];
-                    }
-                }
-            }
             
             
-            public override void Start(float aDays,
-                float aDelayDays,
-                System.Action<float, float> anUpdateProgress,
-                System.Action<float, float> anUpdateDelayProgress)
-            {
-                if (entityLogicData.IsBusy) return;
-                
-                entityLogicData.SetState(state);
-                
-                state.Init(aDays, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteComponentAction);
-            }
-
-
-            private void OnCompleteComponentAction()
-            {
-                onComponentCompletedAction?.Invoke(entityId);
-            }
-
-
+            #region destroy
+            
             public override void Destroy()
             {
                 base.Destroy();
@@ -73,8 +43,11 @@ namespace EG
             {
                 onComponentCompletedAction = null;
                 entityLogicData?.Destroy();
-                state?.Destroy();
             }
+            
+            #endregion
+
+
         }
 
     }

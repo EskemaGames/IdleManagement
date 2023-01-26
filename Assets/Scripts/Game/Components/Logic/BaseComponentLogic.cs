@@ -48,18 +48,13 @@ namespace EG
             {
                 canExecuteComponent = true;
             }
-            
+
             public virtual void Start(float aDays,
                 float aDelayDays,
                 System.Action<float, float> anUpdateProgress,
-                System.Action<float, float> anUpdateDelayProgress){}
-            
-            public virtual void Start(IWorkData aWorkData,
-                float aDays,
-                float aDelayDays,
-                System.Action<float, float> anUpdateProgress,
-                System.Action<float, float> anUpdateDelayProgress){}
-            
+                System.Action<float, float> anUpdateDelayProgress,
+                System.Action<uint> onComplete){}
+
             public virtual void Stop()
             {
                 canExecuteComponent = false;

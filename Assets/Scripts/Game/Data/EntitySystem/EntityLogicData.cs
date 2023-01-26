@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using EG.Core.AttributesSystem;
@@ -13,7 +12,7 @@ namespace EG
     {
         public class EntityLogicData : IGameTime
         {
-
+            
             private EntityData entityData = new EntityData();
             private IEntityView entityView = null;
             private List<BaseComponentLogic> logicComponents = new List<BaseComponentLogic>();
@@ -84,25 +83,22 @@ namespace EG
                 entityView = aView;
             }
 
-            public void SetState(EntityState aState)
-            {
-                entityData.SetEntityState(aState);
-            }
+            public EntityState GetState => entityData.GetCurrentState;
 
-            public bool IsBusy => entityData.GetCurrentState?.IsBusy ?? false;
+            public bool IsBusy => entityData.GetCurrentState.IsBusy;
 
             public GameEnums.EntityType GetEntityNameId => entityData.GetNameId;
 
             public GameEnums.GroupTypes GetGroupId => entityData.GetGroupType;
 
-            public BaseComponentLogic GetComponent(Type aComponentType)
+            public T GetLogicComponent<T>() where T : BaseComponentLogic
             {
-                for (var i = 0; i < logicComponents.Count; ++i)
+                for (int i = 0, max = logicComponents.Count; i < max; ++i)
                 {
                     BaseComponentLogic component = logicComponents[i];
-                    if (component.GetType() == aComponentType)
+                    if (component is T)
                     {
-                        return component;
+                        return component as T;
                     }
                 }
 

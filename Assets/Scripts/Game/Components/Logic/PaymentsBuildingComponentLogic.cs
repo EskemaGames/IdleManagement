@@ -1,13 +1,12 @@
-using System.Collections.Generic;
 using EG.Core.Entity;
 using UnityEngine;
 
 namespace EG
 {
-    namespace Core.Components
+    namespace Core.ComponentsSystem
     {
 
-        public class PaymentsComponentLogic : BaseComponentLogic
+        public class PaymentsBuildingComponentLogic : BaseComponent
         {
 
             private BuildingLogicData buildingLogicData = null;
@@ -23,33 +22,29 @@ namespace EG
             
 
             #region init
-
-            public override void InitComponent(EntityLogicData aLogicData, List<BaseComponentLogic> aLogicComponents)
+            
+            public override void InitComponent(uint anEntityId, params object[] args)
             {
-                currentMoney = 0;
-                tmpTotalPayments = 0;
+                entityId = anEntityId;
                 
-                if (aLogicData == null) return;
-                
-                entityId = aLogicData.GetId;
-                initialMoneyAmount = (uint)aLogicData.GetAttributeValue(Attribute_Enums.AttributeType.InitialMoneyAttr);
-            }
-
-            #endregion
-
-
-            public override void SetData(params object[] args)
-            {
                 for (var i = 0; i < args.Length; ++i)
                 {
                     if (args[i] is BuildingLogicData)
                     {
                         buildingLogicData = (BuildingLogicData) args[i];
+                        break;
                     }
                 }
+                
+                currentMoney = 0;
+                tmpTotalPayments = 0;
+                
+                initialMoneyAmount = (uint)buildingLogicData.GetAttributeValue(Attribute_Enums.AttributeType.InitialMoneyAttr);
             }
-            
 
+            #endregion
+
+            
             
             public override void Reset()
             {

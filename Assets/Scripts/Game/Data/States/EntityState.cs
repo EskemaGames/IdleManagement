@@ -1,16 +1,14 @@
 
-
 namespace EG
 {
     namespace Core.Entity
     {
         public class EntityState
         {
-
-            private GameEnums.EntityStates stateId = GameEnums.EntityStates.Max;
+            
             private float time = 0f;
             private float delayTime = 0f;
-            private bool finished = false;
+            private bool finished = true;
             private bool isBusy = false;
 
             private float tmpTimer = 0f;
@@ -26,7 +24,6 @@ namespace EG
             public bool IsBusy => isBusy;
             public float GetTime => time;
             public float GetDelayTime => delayTime;
-            public GameEnums.EntityStates GetCurrentState => stateId;
 
 
             #region constructor
@@ -37,7 +34,6 @@ namespace EG
 
             public EntityState(EntityState aState)
             {
-                stateId = aState.stateId;
                 time = aState.time;
                 delayTime = aState.delayTime;
                 finished = aState.finished;
@@ -82,6 +78,7 @@ namespace EG
                 onComplete = aOnComplete;
 
                 finished = false;
+                isBusy = true;
             }
 
             public void Destroy()
@@ -114,6 +111,9 @@ namespace EG
 
             private void OnFinish()
             {
+                finished = true;
+                isBusy = false;
+                
                 onComplete?.Invoke();
                 onComplete = null;
 
@@ -136,7 +136,7 @@ namespace EG
             
             private void ConsumeTime(float aDeltaTime)
             {
-                if (delayTime < 0f)
+                if (delayTime <= 0f)
                 {
                     if (time > 0f && time != -1f)
                     {
@@ -146,8 +146,6 @@ namespace EG
                     }
                     else
                     {
-                        finished = true;
-                        isBusy = false;
                         OnFinish();
                     }
                 }

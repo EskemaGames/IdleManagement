@@ -1,13 +1,13 @@
-using System.Collections.Generic;
 using EG.Core.Entity;
 using EG.Core.Interfaces;
 
+
 namespace EG
 {
-    namespace Core.Components
+    namespace Core.ComponentsSystem
     {
 
-        public class FarmComponentLogic : BaseComponentLogic
+        public class FarmComponentLogic : BaseComponent
         {
             
             private BuildingLogicData buildingLogicData = null;
@@ -17,7 +17,19 @@ namespace EG
             
             #region component
 
-            public override void InitComponent(EntityLogicData aLogicData, List<BaseComponentLogic> aLogicComponents) { }
+            public override void InitComponent(uint anEntityId, params object[] args)
+            {
+                entityId = anEntityId;
+
+                for (var i = 0; i < args.Length; ++i)
+                {
+                    if (args[i] is BuildingLogicData)
+                    {
+                        buildingLogicData = (BuildingLogicData) args[i];
+                        break;
+                    }
+                }
+            }
 
             #endregion
 
@@ -47,18 +59,7 @@ namespace EG
 
 
             #region data
-            
-            public override void SetData(params object[] args)
-            {
-                for (var i = 0; i < args.Length; ++i)
-                {
-                    if (args[i] is BuildingLogicData)
-                    {
-                        buildingLogicData = (BuildingLogicData) args[i];
-                    }
-                }
-            }
-            
+
             public override void SetData(IWorkData aWorkData)
             {
                 CheckCurrentWorkToResetIfDataChanged(aWorkData);
@@ -84,6 +85,8 @@ namespace EG
                     
                     WorkComponentLogic component = entity.GetLogicComponent<WorkComponentLogic>();
                     
+                    component?.SetData(workData);
+                    
                     component?.Start(
                         aDays,
                         aDelayDays,
@@ -104,9 +107,9 @@ namespace EG
                     return;
                 }
                 
-                PaymentsComponentLogic paymentsComponent = entity.GetLogicComponent<PaymentsComponentLogic>();
+                PaymentsBuildingComponentLogic paymentsBuildingComponent = buildingLogicData.GetLogicComponent<PaymentsBuildingComponentLogic>();
 
-                if (paymentsComponent != null)
+                if (paymentsBuildingComponent != null)
                 {
                     uint cost = (uint)entity.GetAttributeValue(Attribute_Enums.AttributeType.SalaryAttr);
                     
@@ -114,7 +117,7 @@ namespace EG
                     
                     cost *= component.GetCurrentTimeToWorkAmount;
                     
-                    paymentsComponent.SetTotalPayments(cost);
+                    paymentsBuildingComponent.SetTotalPayments(cost);
                 }
                 
                 onComponentCompletedAction?.Invoke(anEntityId);
@@ -138,10 +141,7 @@ namespace EG
             
             private void ResetWorks(EntityLogicData aEntity)
             {
-                for (int i = 0, max = aEntity.GetComponentsLogic.Count; i < max; ++i)
-                {
-                    aEntity.GetComponentsLogic[i].ResetDaily();
-                }
+                aEntity.ResetDaily();
             }
             
             #endregion

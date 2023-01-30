@@ -1,16 +1,14 @@
-using System.Collections.Generic;
 using EG.Core.Entity;
 using EG.Core.Interfaces;
-
-
+using UnityEngine;
 
 
 namespace EG
 {
-    namespace Core.Components
+    namespace Core.ComponentsSystem
     {
 
-        public class WorkComponentLogic : BaseComponentLogic
+        public class WorkComponentLogic : BaseComponent
         {
             
 
@@ -31,11 +29,19 @@ namespace EG
 
             
             #region init component
-
-            public override void InitComponent(EntityLogicData aLogicData, List<BaseComponentLogic> aLogicComponents)
+            
+            public override void InitComponent(uint anEntityId, params object[] args)
             {
-                entityId = aLogicData.GetId;
-                entityLogicData = aLogicData;
+                entityId = anEntityId;
+
+                for (var i = 0; i < args.Length; ++i)
+                {
+                    if (args[i] is EntityLogicData)
+                    {
+                        entityLogicData = (EntityLogicData) args[i];
+                        break;
+                    }
+                }
             }
 
             #endregion
@@ -79,10 +85,10 @@ namespace EG
             
             #region update
 
-            public override void Update(float aDeltaTime = 0)
+            public override void DoUpdate(float aDeltaTime = 1f)
             {
                 if (!canExecuteComponent) return;
-                
+
                 entityLogicData?.GetState.OnUpdate(aDeltaTime);
             }
 
@@ -105,7 +111,9 @@ namespace EG
             {
                 if (entityLogicData.IsBusy) return;
                 
-                if (IsWorking()) return;
+                if (!GotAWork()) return;
+
+                Debug.Log("Workcomponent can actually Start= " + entityId);
 
                 onComponentCompletedAction = onComplete;
                 
@@ -114,6 +122,7 @@ namespace EG
 
             private void OnCompleteComponentAction()
             {
+                Debug.Log("Workcomponent OnCompleteComponentAction " + entityId);
                 entityLogicData.GetState.OnCancelUpdate();
    
                 currentTimeToWorkAmount += workData.TimeToWorkAmount;
@@ -145,7 +154,7 @@ namespace EG
                 }
             }
             
-            private bool IsWorking()
+            private bool GotAWork()
             {
                 return workData != null;
             }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using EG.Core.AttributesSystem;
 using EG.Core.Parsedata;
 using EG.Core.Util;
@@ -27,7 +28,12 @@ namespace EG
             private List<EntitiesParsed> entities = new List<EntitiesParsed>();
             private List<EntitiesParsed> buildings = new List<EntitiesParsed>();
 
+            
+            public ReadOnlyCollection<EntitiesParsed> GetEntitiesData => entities.AsReadOnly();
+            public ReadOnlyCollection<EntitiesParsed> GetBuildingsData => buildings.AsReadOnly(); 
+            
 
+            
             #region init and destroy
             
             protected override void Initialize(bool dontdestroy = false)
@@ -47,10 +53,8 @@ namespace EG
 
             public void Init()
             {
-
                 ParseEntities(entitiesList.text, entities);
                 ParseEntities(buildingsList.text, buildings);
-                
             }
 
 

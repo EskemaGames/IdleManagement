@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using EG.Core.AttributesSystem;
-using EG.Core.Components;
+using EG.Core.ComponentsSystem;
 using EG.Core.Interfaces;
 using EG.Core.Messages;
 
@@ -15,11 +14,10 @@ namespace EG
             
             private EntityData entityData = new EntityData();
             private IEntityView entityView = null;
-            private List<BaseComponentLogic> logicComponents = new List<BaseComponentLogic>();
+            private List<BaseComponent> logicComponents = new List<BaseComponent>();
             private AttributesAndModifiersController attributesAndModifiersController = new AttributesAndModifiersController();
             private EG_MessageDeadByAge messageDeadByAge = new EG_MessageDeadByAge();
-            public ReadOnlyCollection<BaseComponentLogic> GetComponentsLogic => logicComponents.AsReadOnly();
-            
+
 
             #region constructor
 
@@ -40,12 +38,12 @@ namespace EG
 
                 attributesAndModifiersController.AddAttributes(entityData.GetAttributes);
                 
-                logicComponents =  new List<BaseComponentLogic>(anEntityData.GetComponents);
+                logicComponents =  new List<BaseComponent>(anEntityData.GetComponents);
                 
                 for (var i = 0; i < logicComponents.Count; ++i)
                 {
-                    BaseComponentLogic component = logicComponents[i];
-                    component.InitComponent(this, logicComponents);
+                    BaseComponent component = logicComponents[i];
+                    component.InitComponent(anEntityData.GetUniqueId, this, logicComponents);
                     component.Start();
                 }
             }
@@ -91,11 +89,11 @@ namespace EG
 
             public GameEnums.GroupTypes GetGroupId => entityData.GetGroupType;
 
-            public T GetLogicComponent<T>() where T : BaseComponentLogic
+            public T GetLogicComponent<T>() where T : BaseComponent
             {
                 for (int i = 0, max = logicComponents.Count; i < max; ++i)
                 {
-                    BaseComponentLogic component = logicComponents[i];
+                    BaseComponent component = logicComponents[i];
                     if (component is T)
                     {
                         return component as T;
@@ -108,6 +106,14 @@ namespace EG
             public uint GetId => entityData.GetUniqueId;
 
             public float GetAttributeValue(Attribute_Enums.AttributeType anAttributeType) => attributesAndModifiersController.GetAttributeValue(anAttributeType);
+
+            public void ResetDaily()
+            {
+                for (int i = 0, max = logicComponents.Count; i < max; ++i)
+                {
+                    logicComponents[i].ResetDaily();
+                }
+            }
             
             #endregion
 
@@ -118,8 +124,8 @@ namespace EG
             {
                 for (var i = 0; i < logicComponents.Count; ++i)
                 {
-                    BaseComponentLogic component = logicComponents[i];
-                    component.Update(aDeltaTime);
+                    BaseComponent component = logicComponents[i];
+                    component.DoUpdate(aDeltaTime);
                 }
             }
             

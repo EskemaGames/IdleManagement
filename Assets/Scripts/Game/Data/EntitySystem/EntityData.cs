@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using EG.Core.AttributesSystem;
-using EG.Core.Components;
+using EG.Core.ComponentsSystem;
 using UnityEngine;
 
 namespace EG
@@ -18,7 +18,7 @@ namespace EG
             //store the class for later instantiate dynamically from other places
             [SerializeField] private string className = System.String.Empty;
             [SerializeField] private uint uniqueId = 0;
-            [SerializeField] private List<BaseComponentLogic> components = new List<BaseComponentLogic>();
+            [SerializeField] private List<BaseComponent> components = new List<BaseComponent>();
             [SerializeField] private List<BaseAttribute> attributes = new List<BaseAttribute>();
             [SerializeField] private EntityState currentState = new EntityState();
             
@@ -27,7 +27,7 @@ namespace EG
             public GameEnums.GroupTypes GetGroupType => groupType;
             public uint GetUniqueId => uniqueId;
             public EntityState GetCurrentState => currentState;
-            public List<BaseComponentLogic> GetComponents => components;
+            public List<BaseComponent> GetComponents => components;
             public List<BaseAttribute> GetAttributes => attributes;
             
 
@@ -43,7 +43,7 @@ namespace EG
                 uniqueId = aData.uniqueId;
                 currentState = aData.currentState;
                 attributes = new List<BaseAttribute>(aData.attributes);
-                components = new List<BaseComponentLogic>(aData.components);
+                components = new List<BaseComponent>(aData.components);
             }
 
             public EntityData Clone()
@@ -61,7 +61,7 @@ namespace EG
                 GameEnums.EntityType aNameId,
                 string aClassName,
                 uint aUniqueId,
-                List<BaseComponentLogic> aComponentsList,
+                List<BaseComponent> aComponentsList,
                 List<BaseAttribute> anAttributesList)
             {
                 groupType = aGroupType;
@@ -70,7 +70,7 @@ namespace EG
                 uniqueId = aUniqueId;
 
                 attributes = new List<BaseAttribute>(anAttributesList);
-                components = new List<BaseComponentLogic>(aComponentsList);
+                components = new List<BaseComponent>(aComponentsList);
             }
             
             public void Destroy()

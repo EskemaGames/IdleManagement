@@ -3,10 +3,10 @@ using EG.Core.Entity;
 
 namespace EG
 {
-    namespace Core.Components
+    namespace Core.ComponentsSystem
     {
 
-        public class UpdateComponentLogic : BaseComponentLogic
+        public class UpdateComponentLogic : BaseComponent
         {
             
             private EntityLogicData entityLogicData = null;
@@ -14,13 +14,27 @@ namespace EG
 
 
             #region component
-
-            public override void InitComponent(EntityLogicData aLogicData, List<BaseComponentLogic> aLogicComponents)
+            
+            public override void InitComponent(uint anEntityId, params object[] args)
             {
-                entityId = aLogicData.GetId;
-                entityLogicData = aLogicData;
-                
+                entityId = anEntityId;
+
+                for (var i = 0; i < args.Length; ++i)
+                {
+                    if (args[i] is EntityLogicData)
+                    {
+                        entityLogicData = (EntityLogicData) args[i];
+                        break;
+                    }
+                }
             }
+
+            // public override void InitComponent(EntityLogicData aLogicData, List<BaseComponentLogic> aLogicComponents)
+            // {
+            //     entityId = aLogicData.GetId;
+            //     entityLogicData = aLogicData;
+            //     
+            // }
 
             #endregion
             

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using EG.Core.AttributesSystem;
-using EG.Core.Components;
+using EG.Core.ComponentsSystem;
 using EG.Core.Interfaces;
 using EG.Core.Messages;
+using UnityEngine;
 
 
 namespace EG
@@ -15,16 +15,15 @@ namespace EG
         {
 
             private EntityData entityData = new EntityData();
-            private List<BaseComponentLogic> logicComponents = new List<BaseComponentLogic>(5);
+            private List<BaseComponent> logicComponents = new List<BaseComponent>(5);
             private List<EntityLogicData> entitiesLogicData = new List<EntityLogicData>(100);
             private AttributesAndModifiersController attributesAndModifiersController = new AttributesAndModifiersController();
 
+            private int totalEntities = 0;
             private int totalDaysPassed = 0;
             private int totalDaysPassedPayments = 0;
             private readonly int paymentDay = 0;
             
-            public ReadOnlyCollection<BaseComponentLogic> GetComponentsLogic => logicComponents.AsReadOnly();
-
 
             #region constructor
 
@@ -46,13 +45,12 @@ namespace EG
 
                 paymentDay = (int)attributesAndModifiersController.GetAttributeValue(Attribute_Enums.AttributeType.PaymentDayAttr);
                 
-                logicComponents =  new List<BaseComponentLogic>(anEntityData.GetComponents);
+                logicComponents =  new List<BaseComponent>(anEntityData.GetComponents);
                 
                 for (var i = 0; i < logicComponents.Count; ++i)
                 {
-                    BaseComponentLogic component = logicComponents[i];
-                    component.InitComponent(null, logicComponents);
-                    component.SetData(this);
+                    BaseComponent component = logicComponents[i];
+                    component.InitComponent(anEntityData.GetUniqueId, this, logicComponents);
                     component.Start();
                 }
             }
@@ -150,13 +148,27 @@ namespace EG
                 entitiesLogicData.RemoveAt(anArrayPosition);
             }
 
-            public int GetTotalEntities => entitiesLogicData.Count;
+            public int GetTotalEntities => totalEntities;
             
             #endregion
 
 
             #region building API
+            
+            public T GetLogicComponent<T>() where T : BaseComponent
+            {
+                for (int i = 0, max = logicComponents.Count; i < max; ++i)
+                {
+                    BaseComponent component = logicComponents[i];
+                    if (component is T)
+                    {
+                        return component as T;
+                    }
+                }
 
+                return null;
+            }
+            
             public List<BaseAttribute> GetUpdateableAttributes() => attributesAndModifiersController.GetAllUpdateableAttributes();
 
             public float GetAttributeValue(Attribute_Enums.AttributeType anAttributeType) => attributesAndModifiersController.GetAttributeValue(anAttributeType);
@@ -191,7 +203,10 @@ namespace EG
                 attributesAndModifiersController.AddModifier(modifier);
                 
                 entitiesLogicData.Add(anEntityLogicData);
+
+                totalEntities = entitiesLogicData.Count;
                 
+                Debug.Log("Entity added= " + anEntityLogicData.GetEntityNameId + " to building= " + entityData.GetNameId);
                 return true;
             }
 
@@ -210,23 +225,17 @@ namespace EG
                 attributesAndModifiersController.AddModifier(modifier);
                 
                 entitiesLogicData.RemoveAt(anArrayPosition);
+                
+                totalEntities = entitiesLogicData.Count;
             }
             
             #endregion
             
             
             #region using building API
-            
-            public void SetData(IWorkData aWorkData)
-            {
-                for (var i = 0; i < logicComponents.Count; ++i)
-                {
-                    BaseComponentLogic component = logicComponents[i];
-                    component.SetData(aWorkData);
-                } 
-            }
-            
-            public void Start(float aDays,
+
+            public void Start(IWorkData aWorkData,
+                float aDays,
                 float aDelayDays,
                 System.Action<float, float> anUpdateProgress,
                 System.Action<float, float> anUpdateDelayProgress,
@@ -234,8 +243,10 @@ namespace EG
             {
                 for (var i = 0; i < logicComponents.Count; ++i)
                 {
-                    BaseComponentLogic component = logicComponents[i];
-
+                    BaseComponent component = logicComponents[i];
+                    
+                    component.SetData(aWorkData);
+                    
                     component.Start(
                         aDays,
                         aDelayDays,
@@ -244,7 +255,7 @@ namespace EG
                         onCompleteEntity);
                 }
             }
-            
+
             #endregion
 
 
@@ -282,7 +293,7 @@ namespace EG
 
             public virtual void IOnYearPassed(uint aYear)
             {
-
+                Debug.Log("On year passed on building= " + entityData.GetNameId);
             }
 
             public virtual void IOnDayPassed(uint aDay)
@@ -291,6 +302,8 @@ namespace EG
                 totalDaysPassed++;
                 
                 totalDaysPassedPayments++;
+                
+                Debug.Log("On day passed on building= " + entityData.GetNameId + " day= " + aDay + " total days passed= " + totalDaysPassed);
 
                 CheckMonthlyPayments();
             }
@@ -306,27 +319,15 @@ namespace EG
                 {
                     totalDaysPassedPayments = 0;
 
-                    PaymentsComponentLogic paymentsComponent = GetLogicComponent<PaymentsComponentLogic>();
+                    PaymentsBuildingComponentLogic paymentsBuildingComponent = GetLogicComponent<PaymentsBuildingComponentLogic>();
                     
-                    paymentsComponent?.SetTotalPayments(0);
+                    paymentsBuildingComponent?.SetTotalPayments(0);
 
                 }
             }
 
 
-            private T GetLogicComponent<T>() where T : BaseComponentLogic
-            {
-                for (int i = 0, max = logicComponents.Count; i < max; ++i)
-                {
-                    BaseComponentLogic component = logicComponents[i];
-                    if (component is T)
-                    {
-                        return component as T;
-                    }
-                }
 
-                return null;
-            }
             
         }
 

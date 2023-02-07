@@ -1,7 +1,7 @@
 ﻿{
-  "AllAttributes":[
+  "Entities": [
     {
-      "Type" : "Slave",
+      "Type": "Slave",
       "Attributes": [
         {
           "Value": 1.0,
@@ -39,95 +39,11 @@
           "AttributeName": "WorkTimeAttr"
         },
         {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 2.0,
-          "UpdateLevels": [
-            {
-              "IncreaseStep": 1.0
-            }
-          ],
-          "IsUpdateable": true,
+          "Value": 0.0,
+          "MinValue": 0.0,
+          "MaxValue": 15.0,
           "FormulaType": "Addition",
-          "AttributeName": "AttackAttr"
-        },
-        {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 2.0,
-          "UpdateLevels": [
-            {
-              "IncreaseStep": 1.0
-            }
-          ],
-          "IsUpdateable": true,
-          "FormulaType": "Addition",
-          "AttributeName": "DefenseAttr"
-        }
-      ],
-      "Works": [
-        {
-          "WorkAction": "Plant"
-        }
-      ],
-      "Components": [
-        {
-          "ClassName": "WorkComponentLogic",
-          "ClassName": "IdleComponentLogic"
-          
-        }
-      ]
-    },
-    {
-      "Type" : "Farmer",
-      "Attributes": [
-        {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 2.0,
-          "FormulaType": "Addition",
-          "AttributeName": "FoodAttr"
-        },
-        {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 2.0,
-          "UpdateLevels": [
-            {
-              "IncreaseStep": 1.0
-            }
-          ],
-          "IsUpdateable": true,
-          "FormulaType": "Addition",
-          "AttributeName": "SalaryAttr"
-        },
-        {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 2.0,
-          "FormulaType": "Addition",
-          "AttributeName": "AgeAttr"
-        },
-        {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 1.0,
-          "FormulaType": "Addition",
-          "AttributeName": "FemaleAttr"
-        },
-        {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 1.0,
-          "FormulaType": "Addition",
-          "AttributeName": "HealthAttr"
-        },
-        {
-          "Value": 2.0,
-          "MinValue": 1.0,
-          "MaxValue": 2.0,
-          "FormulaType": "Addition",
-          "AttributeName": "WorkTimeAttr"
+          "AttributeName": "DaysWithoutFoodAttr"
         },
         {
           "Value": 1.0,
@@ -159,11 +75,14 @@
       "Components": [
         {
           "ClassName": "WorkComponentLogic"
+        },
+        {
+          "ClassName": "FoodComponentLogic"
         }
       ]
     },
     {
-      "Type" : "Merchant",
+      "Type": "Farmer",
       "Attributes": [
         {
           "Value": 1.0,
@@ -173,31 +92,24 @@
           "AttributeName": "FoodAttr"
         },
         {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 2.0,
-          "UpdateLevels": [
-            {
-              "IncreaseStep": 1.0
-            }
-          ],
-          "IsUpdateable": true,
-          "FormulaType": "Addition",
-          "AttributeName": "SalaryAttr"
-        },
-        {
-          "Value": 1.0,
-          "MinValue": 1.0,
-          "MaxValue": 2.0,
-          "FormulaType": "Addition",
-          "AttributeName": "AgeAttr"
-        },
-        {
-          "Value": 1.0,
+          "Value": 4.0,
           "MinValue": 1.0,
           "MaxValue": 10.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
           "FormulaType": "Addition",
-          "AttributeName": "MovementSpeedAttr"
+          "AttributeName": "SalaryAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 80.0,
+          "FormulaType": "Addition",
+          "AttributeName": "AgeAttr"
         },
         {
           "Value": 1.0,
@@ -219,6 +131,20 @@
           "MaxValue": 2.0,
           "FormulaType": "Addition",
           "AttributeName": "WorkTimeAttr"
+        },
+        {
+          "Value": 0.0,
+          "MinValue": 0.0,
+          "MaxValue": 15.0,
+          "FormulaType": "Addition",
+          "AttributeName": "DaysWithoutFoodAttr"
+        },
+        {
+          "Value": 0.0,
+          "MinValue": 0.0,
+          "MaxValue": 30.0,
+          "FormulaType": "Addition",
+          "AttributeName": "DaysWithoutPaymentAttr"
         },
         {
           "Value": 1.0,
@@ -252,19 +178,9 @@
           "ClassName": "WorkComponentLogic"
         },
         {
-          "ClassName": "TravelComponentLogic"
-        },
-        {
-          "ClassName": "MerchantComponentLogic"
+          "ClassName": "FoodComponentLogic"
         }
       ]
     }
-    
-    
-    
-    ]
+  ]
 }
-
-    
-
-

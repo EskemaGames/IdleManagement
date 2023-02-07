@@ -7,6 +7,7 @@
         {
 
             public uint EntityId { get; private set; }
+            public uint CategoryId { get; private set; }
 
             //lazy constructor
             public EG_MessageDeadByAge()
@@ -16,15 +17,16 @@
                 EntityId = 0;
             }
 
-            public EG_MessageDeadByAge(uint id) : base(0)
+            public EG_MessageDeadByAge(uint anId) : base(0)
             {
-                EntityId = id;
+                EntityId = anId;
             }
 
-            public void SetData(uint id)
+            public void SetData(uint anId, uint aCategoryId)
             {
                 IsLocal = true;
-                EntityId = id;
+                EntityId = anId;
+                CategoryId = aCategoryId;
             }
         }
 

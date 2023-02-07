@@ -12,20 +12,25 @@ public class Constants
         public const string PreferencesNameData = "UserData";
         public const string SaveGameNameData = "SaveGame";
         public const string SaveExtension = ".data";
+        public const string URL_FULL = "http://eskemagames.es/AllGames/DwarfAdventures/Languages_DwarfAdventure.json";
+        public const string URL = "http://eskemagames.es/AllGames/DwarfAdventures/";
         
+        static public string GreenColor = "[c][00ff00ff]";
         public const float OneDayTime = 1440f; //60 minutes X 24 hours
         public const string Speed1 = "1X";
         public const string Speed2 = "2X";
         public const string Speed4 = "4X";
         public const string Speed5 = "5X";
         
+        //this MUST match whatever value you set within the poolcontroller child gameobject within the scene or scenes where is at
+        public static Vector3 Static_OutsideScreenPos = new Vector3(-5000f, -5000f, -5000f);
 
         
         public const uint EmptyId = 0; //used for any "non-used" stuff
 
-
         public const string NamespaceBaseEntityNameWithAppend = "EG.Core.Entity.";
         public const string NamespaceBaseComponentsNameWithAppend = "EG.Core.ComponentsSystem.";
+        
 
 
         public class ParametersToParse
@@ -73,10 +78,7 @@ public class Constants
                 public const string ControllerDisconnectedDescription = "ControllerDisconnectedDescription";
                 public const string ControllerPressButtonToChangeGamepad = "ControllerPressButtonToChangeGamepad";
 
-                //collision layer names
-                public const string EnemyLayer = "Enemy";
-                public const string PlayerLayer = "Player";
-                public const string CollidablesLayer = "Collidables";
+                public const string EntityType = "EntityType";
 
 
                 //audio files
@@ -94,7 +96,6 @@ public class Constants
                 
                 //misc
                 public const string Empty = "Empty";
-                public const string AmmoLogic = "AmmoLogic";
         }
 
 

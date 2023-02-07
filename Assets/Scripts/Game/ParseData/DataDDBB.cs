@@ -18,7 +18,7 @@ namespace EG
             {
                 public GameEnums.EntityType Type = GameEnums.EntityType.Max;
                 public List<BaseAttribute> Attributes = new List<BaseAttribute>();
-                public List<string> Components = new List<string>();
+                public List<ComponentJsonData> Components = new List<ComponentJsonData>();
             }
 
             [SerializeField] private TextAsset entitiesList = null;
@@ -85,8 +85,7 @@ namespace EG
                     group.Type = type;
 
                     var attrsParsed = new List<BaseAttribute>(10);
-                    var componentsName = new List<string>();
-
+ 
                     for (var j = 0; j < allData.Entities[i].Attributes.Count; ++j)
                     {
                         var formula = (Attribute_Enums.AttributeFormulas) System.Enum.Parse(typeof(Attribute_Enums.AttributeFormulas), allData.Entities[i].Attributes[j].FormulaType);
@@ -116,13 +115,15 @@ namespace EG
                     }
 
 
+                    List<ComponentJsonData> tmpComponentsList = new List<ComponentJsonData>();
                     for (var j = 0; j < allData.Entities[i].Components.Count; ++j)
                     {
-                        componentsName.Add(allData.Entities[i].Components[j].ClassName);
+                        allData.Entities[i].Components[j].ConvertParameters();
+                        tmpComponentsList.Add(allData.Entities[i].Components[j]);
                     }
                     
                     group.Attributes = new List<BaseAttribute>(attrsParsed);
-                    group.Components = new List<string>(componentsName);
+                    group.Components = new List<ComponentJsonData>(tmpComponentsList);
                     
                     anEntitiesList.Add(group);
                 }

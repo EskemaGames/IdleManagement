@@ -1,0 +1,161 @@
+﻿{
+  "Entities": [
+    {
+      "Type": "Storage",
+      "Attributes": [
+        {
+          "Value": 0.0,
+          "MinValue": 0.0,
+          "MaxValue": 0.0,
+          "FormulaType": "Addition",
+          "AttributeName": "NeedsUpdateAttr"
+        },
+        {
+          "Value": 0.0,
+          "MinValue": 0.0,
+          "MaxValue": 2000.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "CapacityBuildingAttr"
+        },
+        {
+          "Value": 0.0,
+          "MinValue": 0.0,
+          "MaxValue": 30000.0,
+          "FormulaType": "Addition",
+          "AttributeName": "GoodsItemsAttr"
+        }
+      ],
+      "Components": [
+        {
+          "ClassName": "PaymentsBuildingComponentLogic"
+        },
+        {
+          "ClassName": "SuppliesItemsBuildingComponentLogic",
+          "ParametersToParse": [
+            "EntityType, Farm"
+          ]
+        },
+        {
+          "ClassName": "SuppliesItemsBuildingComponentLogic",
+          "ParametersToParse": [
+            "EntityType, Smithy"
+          ]
+        },
+        {
+          "ClassName": "StorageBuildingComponentLogic"
+        }
+      ]
+    },
+    {
+      "Type": "Farm",
+      "Attributes": [
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 1.0,
+          "FormulaType": "Addition",
+          "AttributeName": "NeedsUpdateAttr"
+        },
+        {
+          "Value": 0.0,
+          "MinValue": 0.0,
+          "MaxValue": 20.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "CapacityBuildingAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 6.0,
+          "UpdateLevels": [
+            {
+              "IncreaseStep": 1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "FormulaType": "Addition",
+          "AttributeName": "UpdateBuildingLevelAttr"
+        },
+        {
+          "Value": 10.0,
+          "MinValue": 1.0,
+          "MaxValue": 20.0,
+          "FormulaType": "Addition",
+          "UpdateLevels": [
+            {
+              "IncreaseStep": -1.0
+            }
+          ],
+          "IsUpdateable": true,
+          "AttributeName": "UpdateTimeAttr"
+        },
+        {
+          "Value": 50.0,
+          "MinValue": 0.0,
+          "MaxValue": 300.0,
+          "FormulaType": "Addition",
+          "AttributeName": "UpdateCostAttr"
+        },
+        {
+          "Value": 7.0,
+          "MinValue": 0.0,
+          "MaxValue": 30.0,
+          "FormulaType": "Addition",
+          "AttributeName": "PaymentDayAttr"
+        },
+        {
+          "Value": 0.0,
+          "MinValue": 0.0,
+          "MaxValue": 300.0,
+          "FormulaType": "Addition",
+          "AttributeName": "GoodsItemsAttr"
+        },
+        {
+          "Value": 1.0,
+          "MinValue": 1.0,
+          "MaxValue": 1.0,
+          "FormulaType": "Addition",
+          "AttributeName": "StoreGoodsAndItemsAttr"
+        },
+        {
+          "Value": 100.0,
+          "MinValue": 0.0,
+          "MaxValue": 2000.0,
+          "FormulaType": "Addition",
+          "AttributeName": "InitialMoneyAttr"
+        }
+      ],
+      "Components": [
+        {
+          "ClassName": "FarmBuildingComponentLogic"
+        },
+        {
+          "ClassName": "PaymentsBuildingComponentLogic"
+        },
+        {
+          "ClassName": "SuppliesItemsBuildingComponentLogic"
+        },
+        {
+          "ClassName": "UpdateBuildingComponentLogic"
+        }
+      ]
+    }
+
+  ]
+}
+
+    
+
+

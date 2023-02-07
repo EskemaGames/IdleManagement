@@ -1,6 +1,5 @@
 using EG.Core.Entity;
 using EG.Core.Interfaces;
-using UnityEngine;
 
 
 namespace EG
@@ -24,8 +23,6 @@ namespace EG
             public uint GetCurrentResultAmount => currentResultAmount;
             public uint GetCurrentResultItemAmount => currentResultItemAmount;
 
-            
-  
 
             
             #region init component
@@ -69,18 +66,6 @@ namespace EG
             }
             
             #endregion
-
-            
-            #region data
-            
-            public override void SetData(IWorkData aWorkData)
-            {
-                CheckCurrentWorkToResetIfDataChanged(aWorkData);
-
-                workData = aWorkData;
-            }
-
-            #endregion
             
             
             #region update
@@ -102,9 +87,21 @@ namespace EG
                 canExecuteComponent = !aIsPaused;
             }
 
+            
+            #region data
+            
+            public override void SetData(IWorkData aWorkData)
+            {
+                CheckCurrentWorkToResetIfDataChanged(aWorkData);
+
+                workData = aWorkData.Clone();
+            }
+
+            #endregion
+            
     
-            public override void Start(float aDays,
-                float aDelayDays,
+            public override void Start(uint aDays,
+                uint aDelayDays,
                 System.Action<float, float> anUpdateProgress,
                 System.Action<float, float> anUpdateDelayProgress,
                 System.Action<uint> onComplete)
@@ -112,9 +109,7 @@ namespace EG
                 if (entityLogicData.IsBusy) return;
                 
                 if (!GotAWork()) return;
-
-                Debug.Log("Workcomponent can actually Start= " + entityId);
-
+                
                 onComponentCompletedAction = onComplete;
                 
                 entityLogicData.GetState.Init(aDays, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteComponentAction);
@@ -122,7 +117,6 @@ namespace EG
 
             private void OnCompleteComponentAction()
             {
-                Debug.Log("Workcomponent OnCompleteComponentAction " + entityId);
                 entityLogicData.GetState.OnCancelUpdate();
    
                 currentTimeToWorkAmount += workData.TimeToWorkAmount;
@@ -130,6 +124,8 @@ namespace EG
                 currentResultItemAmount += workData.Item.Amount;
                 
                 onComponentCompletedAction?.Invoke(entityId);
+
+                workData = null;
             }
 
 
@@ -152,6 +148,8 @@ namespace EG
                 {
                     workData.Reset();
                 }
+
+                workData = null;
             }
             
             private bool GotAWork()

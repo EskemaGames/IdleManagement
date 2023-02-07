@@ -30,6 +30,20 @@ namespace EG
             public List<BaseComponent> GetComponents => components;
             public List<BaseAttribute> GetAttributes => attributes;
             
+            public T GetComponent<T>() where T : BaseComponent
+            {
+                for (int i = 0, max = components.Count; i < max; ++i)
+                {
+                    BaseComponent component = components[i];
+                    if (component is T)
+                    {
+                        return component as T;
+                    }
+                }
+
+                return null;
+            }
+            
 
             #region constructor
             
@@ -69,12 +83,19 @@ namespace EG
                 className = aClassName;
                 uniqueId = aUniqueId;
 
+                currentState?.OnCancelUpdate();
+                
                 attributes = new List<BaseAttribute>(anAttributesList);
                 components = new List<BaseComponent>(aComponentsList);
             }
             
             public void Destroy()
             {
+                for (var i = components.Count-1; i > -1; --i)
+                {
+                    components[i].Destroy();
+                }
+
                 components.Clear();
                 currentState?.Destroy();
             }

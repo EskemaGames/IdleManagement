@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EG.Core.AttributesSystem;
 using EG.Core.ComponentsSystem;
@@ -15,15 +16,10 @@ namespace EG
         {
 
             private EntityData entityData = new EntityData();
-            private List<BaseComponent> logicComponents = new List<BaseComponent>(5);
-            private List<EntityLogicData> entitiesLogicData = new List<EntityLogicData>(100);
+            private Dictionary<uint, List<EntityLogicData>> entitiesLogicData = new Dictionary<uint, List<EntityLogicData>>();
             private AttributesAndModifiersController attributesAndModifiersController = new AttributesAndModifiersController();
+            private uint needsUpdate = 0;
 
-            private int totalEntities = 0;
-            private int totalDaysPassed = 0;
-            private int totalDaysPassedPayments = 0;
-            private readonly int paymentDay = 0;
-            
 
             #region constructor
 
@@ -32,7 +28,6 @@ namespace EG
             public BuildingLogicData(BuildingLogicData aLogicData)
             {
                 entityData = aLogicData.entityData;
-                logicComponents = aLogicData.logicComponents;
                 entitiesLogicData = aLogicData.entitiesLogicData;
                 attributesAndModifiersController = aLogicData.attributesAndModifiersController; 
             }
@@ -40,19 +35,19 @@ namespace EG
             public BuildingLogicData(EntityData anEntityData)
             {
                 entityData = anEntityData;
+                
+                entityData.GetCurrentState.OnCancelUpdate();
 
                 attributesAndModifiersController.AddAttributes(entityData.GetAttributes);
-
-                paymentDay = (int)attributesAndModifiersController.GetAttributeValue(Attribute_Enums.AttributeType.PaymentDayAttr);
                 
-                logicComponents =  new List<BaseComponent>(anEntityData.GetComponents);
-                
-                for (var i = 0; i < logicComponents.Count; ++i)
+                for (var i = 0; i < entityData.GetComponents.Count; ++i)
                 {
-                    BaseComponent component = logicComponents[i];
-                    component.InitComponent(anEntityData.GetUniqueId, this, logicComponents);
+                    BaseComponent component = entityData.GetComponents[i];
+                    component.InitComponent(anEntityData.GetUniqueId, this, entityData.GetComponents);
                     component.Start();
                 }
+                
+                needsUpdate = (uint)attributesAndModifiersController.GetAttributeValue(Attribute_Enums.AttributeType.NeedsUpdateAttr);
             }
 
             public BuildingLogicData Clone()
@@ -79,15 +74,16 @@ namespace EG
                     OnDeadByAge);
                 
                 entityData?.Destroy();
-         
-                for (var i = logicComponents.Count-1; i > -1; --i)
+                
+                foreach (var tmpEntityList in entitiesLogicData)
                 {
-                    logicComponents[i].Destroy();
-                }
-
-                for (var i = entitiesLogicData.Count-1; i > -1; --i)
-                {
-                    entitiesLogicData[i].Destroy();
+                    var list = tmpEntityList.Value;
+                    
+                    for (var i = list.Count-1; i > -1; --i)
+                    {
+                        var entity = list[i];
+                        entity?.Destroy();
+                    }
                 }
                 
             }
@@ -97,20 +93,21 @@ namespace EG
             
             #region public entity API
 
-            public bool IsBusy()
-            {
-                return entityData.GetCurrentState?.IsBusy ?? false;
-            }
+            public bool IsBusy => entityData.GetCurrentState.IsBusy;
 
+            public EntityState GetState => entityData.GetCurrentState;
+            
             public uint GetId => entityData.GetUniqueId;
             
             public GameEnums.EntityType GetNameId => entityData.GetNameId;
 
-            public EntityLogicData GetEntity(uint anId, out int anArrayPosition)
+            public EntityLogicData GetEntity(uint aCategoryId, uint anId, out int anArrayPosition)
             {
-                for (var i = 0; i < entitiesLogicData.Count; ++i)
+                var list = entitiesLogicData[aCategoryId];
+                
+                for (var i = 0; i < list.Count; ++i)
                 {
-                    EntityLogicData entity = entitiesLogicData[i];
+                    EntityLogicData entity = list[i];
                     
                     if (entity.GetId != anId) continue;
 
@@ -121,34 +118,40 @@ namespace EG
                 anArrayPosition = -1;
                 return null;
             }
-            
-            public EntityLogicData GetEntity(uint anId)
+
+            public EntityLogicData GetEntity(uint aCategoryId, uint anId)
             {
-                for (var i = 0; i < entitiesLogicData.Count; ++i)
+                var list = entitiesLogicData[aCategoryId];
+                
+                for (var i = 0; i < list.Count; ++i)
                 {
-                    EntityLogicData entity = entitiesLogicData[i];
+                    EntityLogicData entity = list[i];
                     
                     if (entity.GetId != anId) continue;
 
                     return entity;
                 }
-
+                
                 return null;
             }
-
-            public EntityLogicData GetEntityByPosition(int anArrayPosition)
+            
+            public EntityLogicData GetEntityByPosition(uint aCategoryId, int anArrayPosition)
             {
-                return entitiesLogicData[anArrayPosition];
-            }
+                var list = entitiesLogicData[aCategoryId];
 
-            public void RemoveEntity(int anArrayPosition)
+                return list[anArrayPosition];
+            }
+            
+            public void RemoveEntity(uint aCategoryId, int anArrayPosition)
             {
                 if (anArrayPosition == -1) return;
 
-                entitiesLogicData.RemoveAt(anArrayPosition);
+                var list = entitiesLogicData[aCategoryId];
+                
+                list.RemoveAt(anArrayPosition);
             }
-
-            public int GetTotalEntities => totalEntities;
+            
+            public int GetTotalEntities => entitiesLogicData[(uint)entityData.GetNameId].Count;
             
             #endregion
 
@@ -157,36 +160,28 @@ namespace EG
             
             public T GetLogicComponent<T>() where T : BaseComponent
             {
-                for (int i = 0, max = logicComponents.Count; i < max; ++i)
-                {
-                    BaseComponent component = logicComponents[i];
-                    if (component is T)
-                    {
-                        return component as T;
-                    }
-                }
-
-                return null;
+                return entityData.GetComponent<T>();
             }
             
             public List<BaseAttribute> GetUpdateableAttributes() => attributesAndModifiersController.GetAllUpdateableAttributes();
 
             public float GetAttributeValue(Attribute_Enums.AttributeType anAttributeType) => attributesAndModifiersController.GetAttributeValue(anAttributeType);
+            public float GetAttributeMaxValue(Attribute_Enums.AttributeType anAttributeType) => attributesAndModifiersController.GetAttributeBaseMaxValue(anAttributeType);
 
             public int GetBuildingCapacity() => (int)attributesAndModifiersController.GetAttributeValue(Attribute_Enums.AttributeType.CapacityBuildingAttr);
             
             public int GetBuildingMaxCapacity() => (int)attributesAndModifiersController.GetAttributeBaseMaxValue(Attribute_Enums.AttributeType.CapacityBuildingAttr);
 
-            public int GetBuildingLevel() => (int)attributesAndModifiersController.GetAttributeValue(Attribute_Enums.AttributeType.UpdateBuildingAttr);
+            public int GetBuildingLevel() => (int)attributesAndModifiersController.GetAttributeValue(Attribute_Enums.AttributeType.UpdateBuildingLevelAttr);
             
-            public int GetBuildingMaxLevel() => (int)attributesAndModifiersController.GetAttributeBaseMaxValue(Attribute_Enums.AttributeType.UpdateBuildingAttr);
-
+            public int GetBuildingMaxLevel() => (int)attributesAndModifiersController.GetAttributeBaseMaxValue(Attribute_Enums.AttributeType.UpdateBuildingLevelAttr);
+            
             public void AddModifier(Modifier aModifier)
             {
                 attributesAndModifiersController.AddModifier(aModifier);
             }
-            
-            public bool AddToBuilding(EntityLogicData anEntityLogicData)
+
+            public bool AddToBuilding(uint aCategoryId, EntityLogicData anEntityLogicData)
             {
                 if (GetBuildingCapacity() >= GetBuildingMaxCapacity()) return false;
                 
@@ -201,54 +196,73 @@ namespace EG
                     false);
                 
                 attributesAndModifiersController.AddModifier(modifier);
-                
-                entitiesLogicData.Add(anEntityLogicData);
 
-                totalEntities = entitiesLogicData.Count;
+                try
+                {
+                    var list = entitiesLogicData[aCategoryId];
+                    
+                    list.Add(anEntityLogicData);
+                    entitiesLogicData[aCategoryId] = list;
+                }
+                catch (Exception e)
+                {
+                    var tmpList = new List<EntityLogicData>();
+                    tmpList.Add(anEntityLogicData);
+                    entitiesLogicData.Add(aCategoryId, new List<EntityLogicData>(tmpList));
+                }
                 
-                Debug.Log("Entity added= " + anEntityLogicData.GetEntityNameId + " to building= " + entityData.GetNameId);
+                anEntityLogicData.SetBuildingTypeId((uint)GetNameId);
+
                 return true;
             }
-
-            public void RemoveFromBuilding(int anArrayPosition)
+            
+            public void RemoveFromBuilding(uint aCategoryId, int anArrayPosition)
             {
-                 Modifier modifier = AttributesAndModifiersController.CreateModifier(
-                     IdGenerator.GetNewUId(),
-                     entityData.GetUniqueId,
-                     -1,
-                     false,
-                     Attribute_Enums.AttributeFormulas.Addition,
-                     -1,
-                     Attribute_Enums.AttributeType.CapacityBuildingAttr,
-                     false);
+                Modifier modifier = AttributesAndModifiersController.CreateModifier(
+                    IdGenerator.GetNewUId(),
+                    entityData.GetUniqueId,
+                    -1,
+                    false,
+                    Attribute_Enums.AttributeFormulas.Addition,
+                    -1,
+                    Attribute_Enums.AttributeType.CapacityBuildingAttr,
+                    false);
                  
                 attributesAndModifiersController.AddModifier(modifier);
                 
-                entitiesLogicData.RemoveAt(anArrayPosition);
-                
-                totalEntities = entitiesLogicData.Count;
+                try
+                {
+                    var list = entitiesLogicData[aCategoryId];
+                    
+                    list.RemoveAt(anArrayPosition);
+                    
+                    entitiesLogicData[aCategoryId] = list;
+                }
+                catch (Exception e)
+                {
+                    entitiesLogicData.Remove(aCategoryId);
+                }
             }
-            
+
             #endregion
             
             
             #region using building API
 
             public void Start(IWorkData aWorkData,
-                float aDays,
-                float aDelayDays,
+                uint aDelayDays,
                 System.Action<float, float> anUpdateProgress,
                 System.Action<float, float> anUpdateDelayProgress,
                 System.Action<uint> onCompleteEntity)
             {
-                for (var i = 0; i < logicComponents.Count; ++i)
+                for (var i = 0; i < entityData.GetComponents.Count; ++i)
                 {
-                    BaseComponent component = logicComponents[i];
+                    BaseComponent component = entityData.GetComponents[i];
                     
                     component.SetData(aWorkData);
                     
                     component.Start(
-                        aDays,
+                        0, 
                         aDelayDays,
                         anUpdateProgress,
                         anUpdateDelayProgress,
@@ -263,10 +277,25 @@ namespace EG
 
             public void OnUpdate(float aDeltaTime)
             {
-                for (var i = 0; i < entitiesLogicData.Count; ++i)
+                if (needsUpdate < 1) return;
+                
+                //now update the components if any implements that update
+                for (var i = 0; i < entityData.GetComponents.Count; ++i)
                 {
-                    EntityLogicData entity = entitiesLogicData[i];
-                    entity.OnUpdate(aDeltaTime);
+                    BaseComponent component = entityData.GetComponents[i];
+                    component.DoUpdate(aDeltaTime);
+                }
+                
+                foreach (var tmpList in entitiesLogicData)
+                {
+                    var list = tmpList.Value;
+                    
+                    //first update all our people within the building
+                    for (var i = 0; i < list.Count; ++i)
+                    {
+                        EntityLogicData entity = list[i];
+                        entity.OnUpdate(aDeltaTime);
+                    }
                 }
             }
             
@@ -277,11 +306,13 @@ namespace EG
 
             private void OnDeadByAge(EG_MessageDeadByAge message)
             {
-                for (var i = 0; i < entitiesLogicData.Count; ++i)
+                var list = entitiesLogicData[message.CategoryId];
+                
+                for (var i = 0; i < list.Count; ++i)
                 {
-                    if (entitiesLogicData[i].GetId != message.EntityId) continue;
+                    if (list[i].GetId != message.EntityId) continue;
             
-                    RemoveFromBuilding(i);
+                    RemoveFromBuilding(message.CategoryId, i);
                     break;
                 }
             }
@@ -291,40 +322,41 @@ namespace EG
             
             #region interface game time
 
-            public virtual void IOnYearPassed(uint aYear)
+            public void IOnYearPassed(uint aYear)
             {
+                if (needsUpdate < 1) return;
+                
+                Debug.Log("\n");
                 Debug.Log("On year passed on building= " + entityData.GetNameId);
+                
+                for (var i = 0; i < entityData.GetComponents.Count; ++i)
+                {
+                    BaseComponent component = entityData.GetComponents[i];
+                    component.UpdateYearData();
+                }
+                
+                Debug.Log("\n");
             }
 
-            public virtual void IOnDayPassed(uint aDay)
+            public void IOnDayPassed(uint aDay)
             {
-
-                totalDaysPassed++;
+                if (needsUpdate < 1) return;
                 
-                totalDaysPassedPayments++;
+                Debug.Log("\n");
+                Debug.Log("On day passed on building= " + entityData.GetNameId + " day= " + aDay);
+        
+                for (var i = 0; i < entityData.GetComponents.Count; ++i)
+                {
+                    BaseComponent component = entityData.GetComponents[i];
+                    component.UpdateDayData();
+                }
                 
-                Debug.Log("On day passed on building= " + entityData.GetNameId + " day= " + aDay + " total days passed= " + totalDaysPassed);
-
-                CheckMonthlyPayments();
+                Debug.Log("\n");
             }
 
             #endregion
 
 
-            private void CheckMonthlyPayments()
-            {
-                if (GetAttributeValue(Attribute_Enums.AttributeType.PaymentDayAttr) != 0f) return;
-
-                if (totalDaysPassedPayments >= paymentDay)
-                {
-                    totalDaysPassedPayments = 0;
-
-                    PaymentsBuildingComponentLogic paymentsBuildingComponent = GetLogicComponent<PaymentsBuildingComponentLogic>();
-                    
-                    paymentsBuildingComponent?.SetTotalPayments(0);
-
-                }
-            }
 
 
 

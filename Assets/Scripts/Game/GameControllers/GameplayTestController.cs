@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Web.UI.WebControls.WebParts;
 using EG.Core.ComponentsSystem;
 using EG.Core.Data;
 using EG.Core.Entity;
@@ -12,7 +13,6 @@ using UnityEngine;
 
 public class GameplayTestController : MonoBehaviour
 {
-
     
     private List<BuildingLogicData> buildings = new List<BuildingLogicData>();
     private List<EntityLogicData> entities = new List<EntityLogicData>();
@@ -21,7 +21,9 @@ public class GameplayTestController : MonoBehaviour
     private GameTimeController timeController = new GameTimeController();
     private List<IGameTime> updateGameTimeList = new List<IGameTime>(5);
     
+   
     
+    #region monobehaviour
 
     private void Update()
     {
@@ -36,6 +38,8 @@ public class GameplayTestController : MonoBehaviour
         }
     }
 
+    #endregion
+    
 
     public void Configure()
     {
@@ -43,10 +47,11 @@ public class GameplayTestController : MonoBehaviour
         
         //prepare the time controller to accelerate or slow down the game time
         timeController.Init(OnDayPassed, OnYearPassed);
-        timeController.SetGameSpeed(Constants.Speed4);
+        timeController.SetGameSpeed(Constants.Speed2);
         
         //add the controller to our list for the update
         updateTimedSystems.Add(timeController);
+
         
         
         //parse buildings
@@ -58,13 +63,29 @@ public class GameplayTestController : MonoBehaviour
             
             for (var j = 0; j < building.Components.Count; ++j)
             {
-                string componentName = building.Components[j];
+                string componentName = building.Components[j].ClassName;
+                
                 Type myTypeLogic = Type.GetType(Constants.NamespaceBaseComponentsNameWithAppend + componentName);
-                BaseComponent componentLogic = (BaseComponent) Activator.CreateInstance(myTypeLogic);
-                    
-                if (componentLogic != null)
+                
+                if (building.Components[j].ParametersToParse.Count > 0)
                 {
-                    componentsList.Add(componentLogic);
+                    var argTypeInstruction = new object[]
+                        {building.Components[j].ParametersToParse};
+                    BaseComponent componentLogic = (BaseComponent) Activator.CreateInstance(myTypeLogic, argTypeInstruction);
+                    
+                    if (componentLogic != null)
+                    {
+                        componentsList.Add(componentLogic);
+                    }
+                }
+                else
+                {
+                    BaseComponent componentLogic = (BaseComponent) Activator.CreateInstance(myTypeLogic);
+                    
+                    if (componentLogic != null)
+                    {
+                        componentsList.Add(componentLogic);
+                    }
                 }
             }
             
@@ -95,7 +116,7 @@ public class GameplayTestController : MonoBehaviour
             
             for (var j = 0; j < entity.Components.Count; ++j)
             {
-                string componentName = entity.Components[j];
+                string componentName = entity.Components[j].ClassName;
                 Type myTypeLogic = Type.GetType(Constants.NamespaceBaseComponentsNameWithAppend + componentName);
                 BaseComponent componentLogic = (BaseComponent) Activator.CreateInstance(myTypeLogic);
                     
@@ -119,8 +140,9 @@ public class GameplayTestController : MonoBehaviour
             var newEntity = new EntityLogicData(data);
 
             entities.Add(newEntity);
+            
+            updateGameTimeList.Add(newEntity);
         }
-
         
     }
 
@@ -129,17 +151,49 @@ public class GameplayTestController : MonoBehaviour
     {
         Debug.Log("GAME STARTED");
         
-        EntityLogicData entityLogicData = entities[0];
-            
-        ItemWorkData itemWorkData = new ItemWorkData();
-        itemWorkData.Init(5, (uint)GameEnums.WorkItem.Cebollas);
-            
-        WorkData workData = new WorkData();
-        workData.Init(2, 0, itemWorkData.Amount, itemWorkData );
-            
-        buildings[0].AddToBuilding(entities[0]);
-        buildings[0].Start( workData,2, 0, null, null, OnWorkDone);
+        //get an entity to work with
+        ////the farmer is the ID 1 according to the json file
+        var entityToWorkWith = entities[1];
         
+        //prepare the item to do the work
+        ItemWorkData itemWorkData = new ItemWorkData();
+        itemWorkData.Init(5, (uint)GameEnums.WorkItem.Vegetables);
+        
+        //set the work data order
+        //the delay will come from the UI or whatever, for the test no delay is added
+        WorkData workData = new WorkData();
+        workData.Init( (uint)GameEnums.WorkAction.Plant, 0, itemWorkData.Amount, itemWorkData );
+
+        Debug.Log("-- SET FIRST BUILDING WORK TO START--");
+        buildings[0].AddToBuilding((uint)GameEnums.EntityType.Farm, entityToWorkWith);
+        buildings[0].AddToBuilding((uint)GameEnums.EntityType.Farm, entities[0]); //add the slave as well
+        
+        //add the farmer to the building and start the work
+        buildings[1].AddToBuilding((uint)GameEnums.EntityType.Farm, entityToWorkWith);
+        buildings[1].AddToBuilding((uint)GameEnums.EntityType.Farm, entities[0]); //add the slave as well
+        buildings[1].Start( workData,
+            workData.DelayTimeToWorkAmount,
+            null,
+            null,
+            OnWorkDone);
+        
+        
+        Debug.Log("--SET SECOND BUILDING UPDATE WORK TO START--");
+        
+        //prepare the item to do the work
+        ItemWorkData tmpItemWorkData = new ItemWorkData();
+        tmpItemWorkData.Init(0, (uint)GameEnums.WorkItem.Update);
+        
+        //set the work data order
+        //the delay is set to 3 days
+        WorkData workData2 = new WorkData();
+        workData2.Init( (uint)GameEnums.WorkAction.Update, 3, tmpItemWorkData.Amount, tmpItemWorkData );
+        
+        buildings[1].Start( workData2,
+            workData2.DelayTimeToWorkAmount,
+            null,
+            null,
+            OnBuildingUpdateDone);
         
     }
 
@@ -147,7 +201,12 @@ public class GameplayTestController : MonoBehaviour
 
     private void OnWorkDone(uint anEntityId)
     {
-        Debug.Log("On work done in test " + anEntityId);
+        Debug.Log("TEST GAMEPLAYCONTROLLER- On work done in test for entityId= " + anEntityId);
+    }
+    
+    private void OnBuildingUpdateDone(uint anEntityId)
+    {
+        Debug.Log("TEST GAMEPLAYCONTROLLER- On building update done in test for entityId= " + anEntityId);
     }
     
         
@@ -167,7 +226,8 @@ public class GameplayTestController : MonoBehaviour
         }
 
     }
-    
+
+   
 
 
 }

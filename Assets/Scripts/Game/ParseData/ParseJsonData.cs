@@ -19,6 +19,20 @@ namespace EG
         public class ComponentJsonData
         {
             public string ClassName = System.String.Empty;
+            
+            public List<string> ParametersToParse = new List<string>();
+            public Dictionary<string, object> Parameters = new Dictionary<string, object>();
+
+            public void ConvertParameters()
+            {
+                // WE EXPECT 2 PARAMETERS PER "KEY" in the Json file ("Level, 2", "Money, 100", things like that...)
+                for (var counter = 0; counter < ParametersToParse.Count; ++counter)
+                {
+                    var split = ParametersToParse[counter].Split(',');
+                    var trimEmpty = split[1].Trim(' ');
+                    Parameters.Add(split[0], trimEmpty);
+                }
+            }
         }
 
         #endregion
@@ -114,114 +128,7 @@ namespace EG
         
         
         
-        
-        
-        // #region character
-        //
-
-        //
-        // [System.Serializable]
-        // public class CharacterParseJsonData
-        // {
-        //     public string ClassName = System.String.Empty;
-        //     public string PortraitName = System.String.Empty;
-        //     public string PrefabName = System.String.Empty;
-        //     public string AnimationNameId = System.String.Empty;
-        //     public string GroupType = System.String.Empty;
-        //     [System.NonSerialized] public GameEnums.GroupTypes Group = GameEnums.GroupTypes.Max;
-        //     public List<AttributesJsonData> VisualAttributes = new List<AttributesJsonData>();
-        //     public List<AttributesJsonData> Attributes = new List<AttributesJsonData>();
-        //     public List<SkillsParseJsonData> Skills = new List<SkillsParseJsonData>();
-        //     public List<ComponentJsonData> Components = new List<ComponentJsonData>();
-        // }
-        //
-        // [System.Serializable]
-        // public class PARSERootCharactersJsonData
-        // {
-        //     public List<CharacterParseJsonData> Characters = new List<CharacterParseJsonData>();
-        // }
-        //
-        // #endregion
-        //
-        //
-        // #region animations for characters
-        //
-        // [System.Serializable]
-        // public class AnimationsParseJsonData
-        // {
-        //     public string AnimationName = System.String.Empty;
-        //     public string ClipName = System.String.Empty;
-        //     public string VariableName = System.String.Empty;
-        //     public float OffsetAnimation = 0f;
-        //     public float DelayStartAnimation = 0f;
-        //     public int Hash = 0;
-        //     public float AnimationLength = 0f;
-        //     public bool AnimationIsPlaying = false;
-        //     public bool IsLoop = false;
-        // }
-        //
-        // [System.Serializable]
-        // public class ControllersAnimationParseJsonData
-        // {
-        //     public string Name = System.String.Empty;
-        //     public List<AnimationsListJsonData> AnimationList = new List<AnimationsListJsonData>();
-        // }
-        //
-        // [System.Serializable]
-        // public class AnimationsListJsonData
-        // {
-        //     public string PivotAnimatorName = System.String.Empty;
-        //     public List<AnimationsParseJsonData> Animations = new List<AnimationsParseJsonData>();
-        // }
-        //
-        // [System.Serializable]
-        // public class PARSERootAnimationControllersJsonData
-        // {
-        //     public List<ControllersAnimationParseJsonData> CharacterAnimations =
-        //         new List<ControllersAnimationParseJsonData>();
-        // }
-        //
-        // #endregion
-
-
-
-        // #region skills
-        //
-        // [System.Serializable]
-        // public class SkillsParseJsonData
-        // {
-        //     public uint Id = 0;
-        //     public int Cost = 0;
-        //     public float Value = 0f;
-        //     public float MinValue = 0f;
-        //     public float MaxValue = 0f;
-        //     public int TimeActive = -1;
-        //     public string GroupParsed = System.String.Empty;
-        //     public string AttributeName = System.String.Empty;
-        //     public List<LevelsAttributeJsonData> UpdateLevels = new List<LevelsAttributeJsonData>();
-        //     public string FormulaType = System.String.Empty;
-        //     public string Name = System.String.Empty;
-        //     public List<ModifierJsonData> Modifiers = new List<ModifierJsonData>();
-        //
-        //     [System.NonSerialized] public Attribute_Enums.AttributeType Attribute = Attribute_Enums.AttributeType.Max;
-        //     [System.NonSerialized] public GameEnums.GroupTypes Group = GameEnums.GroupTypes.Max;
-        // }
-        //
-        // [System.Serializable]
-        // public class SkillsListData
-        // {
-        //     public string ClassName = System.String.Empty;
-        //     public List<SkillsParseJsonData> Skills = new List<SkillsParseJsonData>();
-        // }
-        //
-        // [System.Serializable]
-        // public class PARSEAllSkillsData
-        // {
-        //     public List<SkillsListData> AllSkills = new List<SkillsListData>();
-        // }
-        //
-        // #endregion
-
+    
 
     }
 }

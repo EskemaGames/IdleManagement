@@ -7,9 +7,19 @@ public class GameEnums
     [System.Serializable]
     public enum EntityType
     {
+        //people
+        Slave = 1,
         Farmer,
         Merchant,
+        BlackSmith,
         Warrior,
+        
+        //buildings
+        Farm,
+        Smithy,
+        Forge,
+        Storage,
+        
         Max
     }
 
@@ -22,24 +32,15 @@ public class GameEnums
         Npc,
         Max
     };
-    
-    [Serializable]
-    public enum EntityStates
-    {
-        Idle,
-        Travel,
-        Update,
-        Work,
-        Max
-    };
 
     [System.Serializable]
     public enum WorkAction
     {
-        Plant,
-        Paint,
-        Repairing,
-        Travel,
+        Plant = 1,
+        Paint = 2,
+        Repairing = 3,
+        Travel = 4,
+        Update = 5,
         Max
     }
     
@@ -47,11 +48,10 @@ public class GameEnums
     [System.Serializable]
     public enum WorkItem
     {
-        Patatas = 1,
-        Cebollas = 2,
-        Zanahorias = 3,
-        Cucharas = 4,
-        Sartenes = 5,
+        Vegetables = 1,
+        Meat = 2,
+        Update = 3,
+
         Max
     }
 
@@ -65,23 +65,18 @@ public class GameEnums
         HARD,
         MAX
     };
-    
-    
-    [Serializable]
-    public enum WaypointsPathType
-    {
-        Loop,
-        PingPong,
-        Straight,
-        Max
-    };
-    
-    
+
+
     public enum MessageTypes
     {
         Empty = 0,
         DeadByAge = 1,
-        SetPayments = 2,
+        UpdatePayments = 2,
+        ConsumeFood = 3,
+        StoreGoodsSupplies = 4,
+        StoreMoney = 5,
+        UpdateFood = 6,
+
 
         ControllerStateChanged = 4995,
         AchievementUnlock = 5000,

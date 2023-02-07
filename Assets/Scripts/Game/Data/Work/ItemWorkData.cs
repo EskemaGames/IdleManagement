@@ -10,6 +10,19 @@ namespace EG
             private uint id = 0; //id taken from here == GameEnums.WorkItem
             private uint amount = 0;
 
+            public ItemWorkData(){}
+
+            public ItemWorkData(IWorkItem anItem)
+            {
+                id = anItem.GetId;
+                amount = anItem.Amount;
+            }
+            public IWorkItem Clone()
+            {
+                return new ItemWorkData(this);
+            }
+
+            
             public void Init(uint anAmount, uint anId)
             {
                 amount = anAmount;

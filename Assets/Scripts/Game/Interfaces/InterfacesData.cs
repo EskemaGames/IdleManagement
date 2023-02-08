@@ -5,9 +5,10 @@ namespace EG
     {
         public interface IWorkItem
         {
-            void Init(uint anAmount, uint anId);
+            void Init(uint anAmount, uint anId, uint aCost);
             void Reset();
             uint Amount { get; }
+            uint Cost { get; }
             uint GetId { get; }
             IWorkItem Clone();
         }

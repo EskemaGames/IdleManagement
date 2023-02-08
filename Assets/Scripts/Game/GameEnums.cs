@@ -13,12 +13,14 @@ public class GameEnums
         Merchant,
         BlackSmith,
         Warrior,
-        
+        Shopkeeper,
+
         //buildings
-        Farm,
-        Smithy,
-        Forge,
-        Storage,
+        FarmBuilding = 200,
+        SmithyBuilding,
+        ForgeBuilding,
+        StorageBuilding,
+        MarketplaceBuilding,
         
         Max
     }
@@ -41,6 +43,8 @@ public class GameEnums
         Repairing = 3,
         Travel = 4,
         Update = 5,
+        Smithy = 6,
+        Market = 7,
         Max
     }
     
@@ -51,9 +55,35 @@ public class GameEnums
         Vegetables = 1,
         Meat = 2,
         Update = 3,
+        Iron = 4,
+        SellMarket = 5,
+        BuyGoods = 6,
 
         Max
     }
+    
+    
+    // [System.Serializable]
+    // public enum TradingFarmItems
+    // {
+    //     Lechugas = 1,
+    //     Patatas = 2,
+    //     Tomates = 3,
+    //     Acelgas = 4,
+    //     
+    //     Max
+    // }
+    //
+    // [System.Serializable]
+    // public enum TradingSmithyItems
+    // {
+    //     Lechugas = 1,
+    //     Patatas = 2,
+    //     Tomates = 3,
+    //     Acelgas = 4,
+    //     
+    //     Max
+    // }
 
     
     
@@ -76,6 +106,7 @@ public class GameEnums
         StoreGoodsSupplies = 4,
         StoreMoney = 5,
         UpdateFood = 6,
+        DecreaseGoodsSupplies = 7,
 
 
         ControllerStateChanged = 4995,

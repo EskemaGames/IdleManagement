@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Web.UI.WebControls.WebParts;
 using EG.Core.ComponentsSystem;
 using EG.Core.Data;
 using EG.Core.Entity;
@@ -100,6 +99,7 @@ public class GameplayTestController : MonoBehaviour
                 building.Attributes
             );
 
+            Debug.Log(building.Type);
             var newBuilding = new BuildingLogicData(data);
 
             buildings.Add(newBuilding);
@@ -157,7 +157,7 @@ public class GameplayTestController : MonoBehaviour
         
         //prepare the item to do the work
         ItemWorkData itemWorkData = new ItemWorkData();
-        itemWorkData.Init(5, (uint)GameEnums.WorkItem.Vegetables);
+        itemWorkData.Init(5, (uint)GameEnums.WorkItem.Vegetables, 0);
         
         //set the work data order
         //the delay will come from the UI or whatever, for the test no delay is added
@@ -165,12 +165,14 @@ public class GameplayTestController : MonoBehaviour
         workData.Init( (uint)GameEnums.WorkAction.Plant, 0, itemWorkData.Amount, itemWorkData );
 
         Debug.Log("-- SET FIRST BUILDING WORK TO START--");
-        buildings[0].AddToBuilding((uint)GameEnums.EntityType.Farm, entityToWorkWith);
-        buildings[0].AddToBuilding((uint)GameEnums.EntityType.Farm, entities[0]); //add the slave as well
+        buildings[0].AddToBuilding((uint)GameEnums.EntityType.FarmBuilding, entityToWorkWith);
+        buildings[0].AddToBuilding((uint)GameEnums.EntityType.FarmBuilding, entities[0]); //add the slave as well
+        buildings[0].AddToBuilding((uint)GameEnums.EntityType.SmithyBuilding, entities[2]); //add the slave as well
+        buildings[0].AddToBuilding((uint)GameEnums.EntityType.MarketplaceBuilding, entities[4]); //add the slave as well
         
         //add the farmer to the building and start the work
-        buildings[1].AddToBuilding((uint)GameEnums.EntityType.Farm, entityToWorkWith);
-        buildings[1].AddToBuilding((uint)GameEnums.EntityType.Farm, entities[0]); //add the slave as well
+        buildings[1].AddToBuilding((uint)GameEnums.EntityType.FarmBuilding, entityToWorkWith);
+        buildings[1].AddToBuilding((uint)GameEnums.EntityType.FarmBuilding, entities[0]); //add the slave as well
         buildings[1].Start( workData,
             workData.DelayTimeToWorkAmount,
             null,
@@ -182,7 +184,7 @@ public class GameplayTestController : MonoBehaviour
         
         //prepare the item to do the work
         ItemWorkData tmpItemWorkData = new ItemWorkData();
-        tmpItemWorkData.Init(0, (uint)GameEnums.WorkItem.Update);
+        tmpItemWorkData.Init(0, (uint)GameEnums.WorkItem.Update, 0);
         
         //set the work data order
         //the delay is set to 3 days
@@ -195,20 +197,67 @@ public class GameplayTestController : MonoBehaviour
             null,
             OnBuildingUpdateDone);
         
+        
+        
+        Debug.Log("--SET THIRD BUILDING SMITHY WORK TO START--");
+        
+        ItemWorkData itemWorkData3 = new ItemWorkData();
+        itemWorkData3.Init(20, (uint)GameEnums.WorkItem.Iron, 0);
+        
+        //set the work data order
+        //the delay will come from the UI or whatever, for the test no delay is added
+        WorkData workData3 = new WorkData();
+        workData3.Init( (uint)GameEnums.WorkAction.Smithy, 0, itemWorkData.Amount, itemWorkData3 );
+        
+        //add the farmer to the building and start the work
+        buildings[2].AddToBuilding((uint)GameEnums.EntityType.SmithyBuilding, entities[2]); 
+        buildings[2].Start( workData3,
+            workData3.DelayTimeToWorkAmount,
+            null,
+            null,
+            OnWorkSmithyDone);
+        
+        
+        Debug.Log("--SET FOURTH BUILDING MARKET WORK TO START--");
+        
+        ItemWorkData itemWorkData4 = new ItemWorkData();
+        itemWorkData4.Init(10, (uint)GameEnums.WorkItem.SellMarket, 5);
+        
+        //set the work data order
+        //the delay will come from the UI or whatever, for the test no delay is added
+        WorkData workData4 = new WorkData();
+        workData4.Init( (uint)GameEnums.WorkAction.Market, 0, itemWorkData.Amount, itemWorkData4 );
+        
+        //add the farmer to the building and start the work
+        buildings[3].AddToBuilding((uint)GameEnums.EntityType.MarketplaceBuilding, entities[4]); 
+        buildings[3].Start( workData4,
+            workData4.DelayTimeToWorkAmount,
+            null,
+            null,
+            OnWorkSmithyDone);
     }
 
 
 
     private void OnWorkDone(uint anEntityId)
     {
-        Debug.Log("TEST GAMEPLAYCONTROLLER- On work done in test for entityId= " + anEntityId);
+        Debug.Log("TEST GAMEPLAYCONTROLLER- OnWorkDone in test for entityId= " + anEntityId);
     }
     
     private void OnBuildingUpdateDone(uint anEntityId)
     {
-        Debug.Log("TEST GAMEPLAYCONTROLLER- On building update done in test for entityId= " + anEntityId);
+        Debug.Log("TEST GAMEPLAYCONTROLLER- OnBuildingUpdateDone in test for entityId= " + anEntityId);
     }
     
+    private void OnWorkSmithyDone(uint anEntityId)
+    {
+        Debug.Log("TEST GAMEPLAYCONTROLLER- On work done in OnWorkSmithyDone for entityId= " + anEntityId);
+    }
+    
+    private void OnWorkMarketDone(uint anEntityId)
+    {
+        Debug.Log("TEST GAMEPLAYCONTROLLER- On work done in OnWorkMarketDone for entityId= " + anEntityId);
+    }
         
     private void OnDayPassed(uint day)
     {

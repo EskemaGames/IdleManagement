@@ -74,6 +74,8 @@ namespace EG
             
             private void ConsumeFood()
             {
+                if (entityLogicData.GetBuildingTypeId == 0) return;
+                
                 var foodToConsume = (uint)entityLogicData.GetAttributeValue(Attribute_Enums.AttributeType.FoodAttr);
 
                 messageConsumeFood.SetData(entityLogicData.GetBuildingTypeId, foodToConsume, entityId);

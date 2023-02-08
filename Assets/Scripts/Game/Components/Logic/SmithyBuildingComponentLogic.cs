@@ -9,7 +9,7 @@ namespace EG
     namespace Core.ComponentsSystem
     {
 
-        public class FarmBuildingComponentLogic : BaseComponent
+        public class SmithyBuildingComponentLogic : BaseComponent
         {
             
             private BuildingLogicData buildingLogicData = null;
@@ -84,7 +84,7 @@ namespace EG
 
             public override void SetData(IWorkData aWorkData)
             {
-                if (aWorkData.Id != (int)GameEnums.WorkAction.Plant) return;
+                if (aWorkData.Id != (int)GameEnums.WorkAction.Smithy) return;
                 
                 CheckCurrentWorkToResetIfDataChanged(aWorkData);
 
@@ -140,13 +140,13 @@ namespace EG
                 
                 //we have a fake update here, cause I want to know when all workers ended the assigned work
                 //to unlock the component to do more work
-                tmpState.Init(totalWork, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteFakeFarmJob);
+                tmpState.Init(totalWork, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteFakeSmithyJob);
             }
 
             
             #region finished work
             
-            private void OnCompleteFakeFarmJob()
+            private void OnCompleteFakeSmithyJob()
             {
                 tmpState.OnCancelUpdate();
             }
@@ -247,7 +247,8 @@ namespace EG
             }
 
             #endregion
-            
+
+
 
            
         }

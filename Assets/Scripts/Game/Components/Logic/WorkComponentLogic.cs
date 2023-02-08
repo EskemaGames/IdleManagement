@@ -15,6 +15,7 @@ namespace EG
             private uint currentTimeToWorkAmount = 0;
             private uint currentResultAmount = 0;
             private uint currentResultItemAmount = 0;
+            private uint currentCost = 0;
             private IWorkData workData = null;
             
             private System.Action<uint> onComponentCompletedAction = null;
@@ -22,7 +23,7 @@ namespace EG
             public uint GetCurrentTimeToWorkAmount => currentTimeToWorkAmount;
             public uint GetCurrentResultAmount => currentResultAmount;
             public uint GetCurrentResultItemAmount => currentResultItemAmount;
-
+            public uint GetCurrentCost => currentCost;
 
             
             #region init component
@@ -122,6 +123,7 @@ namespace EG
                 currentTimeToWorkAmount += workData.TimeToWorkAmount;
                 currentResultAmount += workData.ResultFromWork;
                 currentResultItemAmount += workData.Item.Amount;
+                currentCost += workData.Item.Cost;
                 
                 onComponentCompletedAction?.Invoke(entityId);
 

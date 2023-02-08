@@ -12,9 +12,7 @@ public class Constants
         public const string PreferencesNameData = "UserData";
         public const string SaveGameNameData = "SaveGame";
         public const string SaveExtension = ".data";
-        public const string URL_FULL = "http://eskemagames.es/AllGames/DwarfAdventures/Languages_DwarfAdventure.json";
-        public const string URL = "http://eskemagames.es/AllGames/DwarfAdventures/";
-        
+
         static public string GreenColor = "[c][00ff00ff]";
         public const float OneDayTime = 1440f; //60 minutes X 24 hours
         public const string Speed1 = "1X";

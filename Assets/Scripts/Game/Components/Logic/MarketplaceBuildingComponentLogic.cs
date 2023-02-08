@@ -9,7 +9,7 @@ namespace EG
     namespace Core.ComponentsSystem
     {
 
-        public class FarmBuildingComponentLogic : BaseComponent
+        public class MarketplaceBuildingComponentLogic : BaseComponent
         {
             
             private BuildingLogicData buildingLogicData = null;
@@ -18,15 +18,18 @@ namespace EG
             private int counterEntitiesWorking = 0;
             private EntityState tmpState = null;
             private PaymentsBuildingComponentLogic paymentsBuildingComponent = null;
-            private SuppliesItemsBuildingComponentLogic suppliesBuildingComponent = null;
             private EG_MessageStoreGoodsSupplies messageStoreGoodsSupplies = null;
-            
-            
+            private EG_MessageStoreMoney messageStoreMoney = null;
+            private EntityLogicData tmpEntity = null;
+
+
             #region component
 
             public override void InitComponent(uint anEntityId, params object[] args)
             {
                 messageStoreGoodsSupplies = new EG_MessageStoreGoodsSupplies();
+                messageStoreMoney = new EG_MessageStoreMoney();
+                
                 tmpState = new EntityState();
                 entityId = anEntityId;
 
@@ -45,8 +48,6 @@ namespace EG
                             BaseComponent component = listComponents[j];
                             
                             if (component is PaymentsBuildingComponentLogic logic) paymentsBuildingComponent = logic;
-
-                            if (component is SuppliesItemsBuildingComponentLogic logicSupplies) suppliesBuildingComponent = logicSupplies;
                         }
                     }
                 }
@@ -75,6 +76,9 @@ namespace EG
                 buildingLogicData?.Destroy();
                 workData?.Reset();
                 tmpState?.Destroy();
+                tmpEntity = null;
+                messageStoreMoney = null;
+                messageStoreGoodsSupplies = null;
             }
             
             #endregion
@@ -84,7 +88,7 @@ namespace EG
 
             public override void SetData(IWorkData aWorkData)
             {
-                if (aWorkData.Id != (int)GameEnums.WorkAction.Plant) return;
+                if (aWorkData.Id != (int)GameEnums.WorkAction.Market) return;
                 
                 CheckCurrentWorkToResetIfDataChanged(aWorkData);
 
@@ -97,6 +101,23 @@ namespace EG
             public override void DoUpdate(float value = 1)
             {
                 tmpState?.OnUpdate(value);
+            }
+
+            public override void UpdateDayData()
+            {
+                base.UpdateDayData();
+
+                //every day our shopkeeper gets paid...
+                if (tmpEntity == null)
+                {
+                    tmpEntity = buildingLogicData.GetEntityByPosition((uint) buildingLogicData.GetNameId, 0);
+                }
+
+                //get how much amount we owe this guy
+                uint cost = (uint) tmpEntity.GetAttributeValue(Attribute_Enums.AttributeType.SalaryAttr);
+                
+                //let's set first the payment
+                SetPayments(cost);
             }
 
 
@@ -140,13 +161,13 @@ namespace EG
                 
                 //we have a fake update here, cause I want to know when all workers ended the assigned work
                 //to unlock the component to do more work
-                tmpState.Init(totalWork, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteFakeFarmJob);
+                tmpState.Init(totalWork, aDelayDays, anUpdateProgress, anUpdateDelayProgress, OnCompleteFakeMarketJob);
             }
 
             
             #region finished work
             
-            private void OnCompleteFakeFarmJob()
+            private void OnCompleteFakeMarketJob()
             {
                 tmpState.OnCancelUpdate();
             }
@@ -172,14 +193,8 @@ namespace EG
                 //get our work component present in the worker who finished the job
                 WorkComponentLogic component = entity.GetLogicComponent<WorkComponentLogic>();
                 
-                //get how much amount we owe this guy
-                uint cost = (uint) entity.GetAttributeValue(Attribute_Enums.AttributeType.SalaryAttr);
-
-                //let's set first the payment
-                SetPayments(cost, component);
-
                 //now set how much work this guy did
-                SetGoodsProduced(component);
+                SetGoodsSold(component);
 
                 //finish our function with all the relevant properties
                 SetCounterEntityWorking();
@@ -192,28 +207,31 @@ namespace EG
                 ResetWorks(entity);
             }
             
-            private void SetPayments(uint aCost, WorkComponentLogic component)
+            private void SetPayments(uint aCost)
             {
                 //remove this to save some performance
                 if (paymentsBuildingComponent == null) return;
                 
-                //does this guy needs to get paid?
-                if (!(aCost > 0f)) return;
-                
-                aCost *= component.GetCurrentTimeToWorkAmount;
-                
                 paymentsBuildingComponent?.SetTotalPaymentSalaries(aCost);
             }
             
-            private void SetGoodsProduced(WorkComponentLogic component)
+            private void SetGoodsSold(WorkComponentLogic component)
             {
-                suppliesBuildingComponent?.SetTotalGoodsItems(component.GetCurrentResultAmount);
-                
+                //decrease our goods by the amount sold
                 messageStoreGoodsSupplies.SetData((uint)buildingLogicData.GetNameId, component.GetCurrentResultAmount, buildingLogicData.GetId);
                 
                 EG_MessagesController<EG_MessageStoreGoodsSupplies>.Post(
-                    (int)GameEnums.MessageTypes.StoreGoodsSupplies,
+                    (int)GameEnums.MessageTypes.DecreaseGoodsSupplies,
                     messageStoreGoodsSupplies);
+               
+                var earnings = component.GetCurrentResultItemAmount * component.GetCurrentCost;
+                
+                //update the money as we get paid for it
+                messageStoreMoney.SetData((uint)buildingLogicData.GetNameId, earnings, buildingLogicData.GetId);
+                EG_MessagesController<EG_MessageStoreMoney>.Post(
+                    (int)GameEnums.MessageTypes.StoreMoney,
+                    messageStoreMoney);
+                
             }
             
             #endregion
@@ -247,7 +265,8 @@ namespace EG
             }
 
             #endregion
-            
+
+
 
            
         }

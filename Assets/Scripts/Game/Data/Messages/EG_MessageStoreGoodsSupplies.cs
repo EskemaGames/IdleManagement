@@ -8,6 +8,7 @@
 
             public uint CategoryEnumId { get; private set; }
             public uint Amount { get; private set; }
+            public int DecreaseAmount { get; private set; } 
 
             //lazy constructor
             public EG_MessageStoreGoodsSupplies()
@@ -29,6 +30,14 @@
                 SenderId = aSenderId;
                 CategoryEnumId = aCategoryId;
                 Amount = anAmount;
+            }
+            
+            public void SetData(uint aCategoryId, int anAmount, uint aSenderId)
+            {
+                IsLocal = true;
+                SenderId = aSenderId;
+                CategoryEnumId = aCategoryId;
+                DecreaseAmount = anAmount;
             }
         }
 

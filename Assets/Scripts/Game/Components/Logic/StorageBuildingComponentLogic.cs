@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using EG.Core.AttributesSystem;
 using EG.Core.Entity;
 using EG.Core.Messages;
+using UnityEngine;
 
 
 namespace EG
@@ -63,6 +64,10 @@ namespace EG
                 
                 EG_MessagesController<EG_MessageStoreGoodsSupplies>.AddObserver(
                     (int)GameEnums.MessageTypes.StoreGoodsSupplies,
+                    StoreGoodsSupplies);
+                
+                EG_MessagesController<EG_MessageStoreGoodsSupplies>.AddObserver(
+                    (int)GameEnums.MessageTypes.DecreaseGoodsSupplies,
                     StoreGoodsSupplies);
                 
                 EG_MessagesController<EG_MessageStoreMoney>.AddObserver(
@@ -140,6 +145,7 @@ namespace EG
             
             private void StoreMoney(EG_MessageStoreMoney aMessage)
             {
+                Debug.Log("store money " + aMessage.Amount);
                 paymentsBuildingComponentLogic.SetMoneyEarned(aMessage.Amount);
             }
 
@@ -158,6 +164,13 @@ namespace EG
                 SuppliesItemsBuildingComponentLogic tmp = GetSuppliesDepot(aMessage.CategoryEnumId);
 
                 tmp?.SetTotalGoodsItems(aMessage.Amount);
+            }
+            
+            private void DereaseGoodsSupplies(EG_MessageStoreGoodsSupplies aMessage)
+            {
+                SuppliesItemsBuildingComponentLogic tmp = GetSuppliesDepot(aMessage.CategoryEnumId);
+
+                tmp?.ConsumeGoodsItems(aMessage.Amount);
             }
             
             #endregion

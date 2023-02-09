@@ -1,6 +1,7 @@
 using EG.Core.Interfaces;
 
 
+
 namespace EG
 {
     namespace Core.Works
@@ -11,13 +12,12 @@ namespace EG
             private uint id = 0; //gameenums.workaction is the id we pass around
             private uint timeToWorkAmount = 0;
             private uint delayTimeToWorkAmount = 0;
-            private uint resultFromWork = 0;
             private IWorkItem item = null;
 
             public uint Id => id;
             public uint TimeToWorkAmount => timeToWorkAmount;
             public uint DelayTimeToWorkAmount => delayTimeToWorkAmount;
-            public uint ResultFromWork => resultFromWork;
+            public uint ResultFromWork => item.Amount;
             public IWorkItem Item => item;
 
             public WorkData(){}
@@ -25,10 +25,9 @@ namespace EG
             public WorkData(IWorkData aData)
             {
                 id = aData.Id;
+                item = aData.Item.Clone();
                 timeToWorkAmount = aData.TimeToWorkAmount;
                 delayTimeToWorkAmount = aData.DelayTimeToWorkAmount;
-                resultFromWork = aData.ResultFromWork;
-                item = aData.Item.Clone();
             }
             
             public IWorkData Clone()
@@ -37,12 +36,11 @@ namespace EG
             }
 
 
-            public void Init(uint anId, uint aDelay, uint aResult, IWorkItem anItem)
+            public void Init(uint anId, uint aDelay,  IWorkItem anItem)
             {
                 id = anId;
                 timeToWorkAmount = 0;
                 delayTimeToWorkAmount = aDelay;
-                resultFromWork = aResult;
                 item = anItem;
             }
 
@@ -56,7 +54,6 @@ namespace EG
                 id = 0;
                 timeToWorkAmount = 0;
                 delayTimeToWorkAmount = 0;
-                resultFromWork = 0;
                 item?.Reset();
             }
 

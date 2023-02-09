@@ -16,7 +16,7 @@ namespace EG
 
         public interface IWorkData
         {
-            void Init(uint anId, uint aDelay, uint aResult, IWorkItem anItem);
+            void Init(uint anId, uint aDelay, IWorkItem anItem);
             void SetWorkTime(uint aTime);
             void Reset();
             uint TimeToWorkAmount { get; }

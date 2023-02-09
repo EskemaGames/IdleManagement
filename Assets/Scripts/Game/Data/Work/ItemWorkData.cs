@@ -36,6 +36,7 @@ namespace EG
             {
                 amount = 0;
                 id = 0;
+                cost = 0;
             }
 
             public uint Amount => amount;

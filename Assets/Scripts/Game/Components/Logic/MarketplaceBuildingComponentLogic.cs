@@ -223,10 +223,10 @@ namespace EG
                 EG_MessagesController<EG_MessageStoreGoodsSupplies>.Post(
                     (int)GameEnums.MessageTypes.DecreaseGoodsSupplies,
                     messageStoreGoodsSupplies);
-               
+                
+                //update the money as we get paid for selling something
                 var earnings = component.GetCurrentResultItemAmount * component.GetCurrentCost;
                 
-                //update the money as we get paid for it
                 messageStoreMoney.SetData((uint)buildingLogicData.GetNameId, earnings, buildingLogicData.GetId);
                 EG_MessagesController<EG_MessageStoreMoney>.Post(
                     (int)GameEnums.MessageTypes.StoreMoney,

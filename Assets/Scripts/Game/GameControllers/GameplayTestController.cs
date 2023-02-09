@@ -98,8 +98,7 @@ public class GameplayTestController : MonoBehaviour
                 componentsList,
                 building.Attributes
             );
-
-            Debug.Log(building.Type);
+            
             var newBuilding = new BuildingLogicData(data);
 
             buildings.Add(newBuilding);
@@ -162,7 +161,21 @@ public class GameplayTestController : MonoBehaviour
         //set the work data order
         //the delay will come from the UI or whatever, for the test no delay is added
         WorkData workData = new WorkData();
-        workData.Init( (uint)GameEnums.WorkAction.Plant, 0, itemWorkData.Amount, itemWorkData );
+        workData.Init( (uint)GameEnums.WorkAction.Plant, 0, itemWorkData );
+
+
+
+        //first "sync" all money and goods to the storage building
+        for (var i = 1; i < buildings.Count; ++i)
+        {
+            var building = buildings[i];
+            var money = building.GetAttributeValue(Attribute_Enums.AttributeType.InitialMoneyAttr);
+            var goods = building.GetAttributeValue(Attribute_Enums.AttributeType.GoodsItemsAttr);
+
+            var storage = buildings[0].GetLogicComponent<StorageBuildingComponentLogic>();
+            storage.InitMoney((uint)money);
+            storage.InitStorage((uint)buildings[i].GetNameId, (uint)goods);
+        }
 
         Debug.Log("-- SET FIRST BUILDING WORK TO START--");
         buildings[0].AddToBuilding((uint)GameEnums.EntityType.FarmBuilding, entityToWorkWith);
@@ -189,7 +202,7 @@ public class GameplayTestController : MonoBehaviour
         //set the work data order
         //the delay is set to 3 days
         WorkData workData2 = new WorkData();
-        workData2.Init( (uint)GameEnums.WorkAction.Update, 3, tmpItemWorkData.Amount, tmpItemWorkData );
+        workData2.Init( (uint)GameEnums.WorkAction.Update, 3, tmpItemWorkData );
         
         buildings[1].Start( workData2,
             workData2.DelayTimeToWorkAmount,
@@ -207,7 +220,7 @@ public class GameplayTestController : MonoBehaviour
         //set the work data order
         //the delay will come from the UI or whatever, for the test no delay is added
         WorkData workData3 = new WorkData();
-        workData3.Init( (uint)GameEnums.WorkAction.Smithy, 0, itemWorkData.Amount, itemWorkData3 );
+        workData3.Init( (uint)GameEnums.WorkAction.Smithy, 0, itemWorkData3 );
         
         //add the farmer to the building and start the work
         buildings[2].AddToBuilding((uint)GameEnums.EntityType.SmithyBuilding, entities[2]); 
@@ -226,7 +239,7 @@ public class GameplayTestController : MonoBehaviour
         //set the work data order
         //the delay will come from the UI or whatever, for the test no delay is added
         WorkData workData4 = new WorkData();
-        workData4.Init( (uint)GameEnums.WorkAction.Market, 0, itemWorkData.Amount, itemWorkData4 );
+        workData4.Init( (uint)GameEnums.WorkAction.Market, 0, itemWorkData4 );
         
         //add the farmer to the building and start the work
         buildings[3].AddToBuilding((uint)GameEnums.EntityType.MarketplaceBuilding, entities[4]); 

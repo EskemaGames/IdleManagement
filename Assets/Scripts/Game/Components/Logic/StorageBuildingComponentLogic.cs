@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using EG.Core.AttributesSystem;
 using EG.Core.Entity;
 using EG.Core.Messages;
-using UnityEngine;
+
 
 
 namespace EG
@@ -137,15 +137,29 @@ namespace EG
                     suppliesBuildingComponents[i]?.Reset();
                 }
             }
+
             
-            
+            #region sync building with the content of others
+
+            public void InitStorage(uint aCategoryId, uint anAmount)
+            {
+                SuppliesItemsBuildingComponentLogic tmp = GetSuppliesDepot(aCategoryId);
+
+                tmp?.SetTotalGoodsItems(anAmount);
+            }
+
+            public void InitMoney(uint anAmount)
+            {
+                paymentsBuildingComponentLogic.SetMoneyEarned(anAmount);
+            }
+
+            #endregion
 
 
             #region store money message
             
             private void StoreMoney(EG_MessageStoreMoney aMessage)
             {
-                Debug.Log("store money " + aMessage.Amount);
                 paymentsBuildingComponentLogic.SetMoneyEarned(aMessage.Amount);
             }
 

@@ -3,6 +3,15 @@
 public class GameEnums
 {
     
+    public enum EventTouchCode
+    {
+        None,
+        Building,
+        Interactable,
+        Entity_click,
+        Entity_deselected,
+        Max
+    }
     
     [System.Serializable]
     public enum EntityType

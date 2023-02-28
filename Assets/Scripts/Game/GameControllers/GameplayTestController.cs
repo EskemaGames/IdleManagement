@@ -12,7 +12,9 @@ using UnityEngine;
 
 public class GameplayTestController : MonoBehaviour
 {
+    [SerializeField] private Camera gameCamera = null;
     
+    private InputRaycastsController inputRaycastsController = new InputRaycastsController();
     private List<BuildingLogicData> buildings = new List<BuildingLogicData>();
     private List<EntityLogicData> entities = new List<EntityLogicData>();
     
@@ -20,6 +22,24 @@ public class GameplayTestController : MonoBehaviour
     private GameTimeController timeController = new GameTimeController();
     private List<IGameTime> updateGameTimeList = new List<IGameTime>(5);
     
+    public BuildingLogicData GetBuilding(string aBuildingName)
+    {
+        BuildingLogicData tmpBuilding = null;
+        for (int i = 0; i < buildings.Count; ++i)
+        {
+            BuildingLogicData building = buildings[i];
+            
+            if (building.GetNameId.ToString().Equals(aBuildingName))
+            {
+                tmpBuilding = building;
+                break;
+            }
+        }
+
+        return tmpBuilding;
+    }
+
+
    
     
     #region monobehaviour
@@ -48,8 +68,11 @@ public class GameplayTestController : MonoBehaviour
         timeController.Init(OnDayPassed, OnYearPassed);
         timeController.SetGameSpeed(Constants.Speed2);
         
+        inputRaycastsController.Init(gameCamera, InspectorStorage.Self().GetLayerInt(Constants.NakedStrings.CollidablesLayer), OnInputTouchedCallback);
+        
         //add the controller to our list for the update
         updateTimedSystems.Add(timeController);
+        updateTimedSystems.Add(inputRaycastsController);
 
         
         
@@ -252,6 +275,49 @@ public class GameplayTestController : MonoBehaviour
 
 
 
+    
+    private void ParseMap()
+    {
+
+        var sceneObjects = GameObject.FindObjectsOfType<SuperObject>();
+        if (sceneObjects != null)
+        {
+            for (var i = 0; i < sceneObjects.Length; i++)
+            {
+                //sceneObjects[i].m_Type
+                
+                var customProps = sceneObjects[i].GetComponent<SuperCustomProperties>();
+
+                if (customProps != null)
+                {
+                    foreach (var property in customProps.m_Properties)
+                    {
+
+                        Debug.Log(property.m_Name);
+                        // if (property.m_Name.Equals(somedataobject.PrefabName))
+                        // {
+                        //     name = property.GetValueAsString();
+                        // }
+                    }
+                }
+
+            }
+        }
+
+    }
+    
+    
+    private void OnInputTouchedCallback(GameObject aGameobject, GameEnums.EventTouchCode anEventCode)
+    {
+        if (anEventCode != GameEnums.EventTouchCode.Entity_deselected)
+        {
+            var mapObjTouched = aGameobject.GetComponentInParent<IMapObjectTouched>();
+            Debug.Log(aGameobject.name);
+            mapObjTouched.IExecute();
+        }
+    }
+    
+    
     private void OnWorkDone(uint anEntityId)
     {
         Debug.Log("TEST GAMEPLAYCONTROLLER- OnWorkDone in test for entityId= " + anEntityId);

@@ -12,6 +12,7 @@ using UnityEngine;
 
 public class GameplayTestController : MonoBehaviour
 {
+
     [SerializeField] private Camera gameCamera = null;
     
     private InputRaycastsController inputRaycastsController = new InputRaycastsController();
@@ -21,7 +22,9 @@ public class GameplayTestController : MonoBehaviour
     private List<IUpdateTimedSystems> updateTimedSystems = new List<IUpdateTimedSystems>(5);
     private GameTimeController timeController = new GameTimeController();
     private List<IGameTime> updateGameTimeList = new List<IGameTime>(5);
+    private ISelectableObject lastSelectedObject = null;
     
+
     public BuildingLogicData GetBuilding(string aBuildingName)
     {
         BuildingLogicData tmpBuilding = null;
@@ -38,9 +41,9 @@ public class GameplayTestController : MonoBehaviour
 
         return tmpBuilding;
     }
-
-
    
+    
+    
     
     #region monobehaviour
 
@@ -58,17 +61,25 @@ public class GameplayTestController : MonoBehaviour
     }
 
     #endregion
+
+
     
 
     public void Configure()
     {
         Debug.Log("GAME Configure");
+
+        lastSelectedObject = null;
         
         //prepare the time controller to accelerate or slow down the game time
         timeController.Init(OnDayPassed, OnYearPassed);
         timeController.SetGameSpeed(Constants.Speed2);
+
+        int layer = InspectorStorage.Self().GetLayerInt(Constants.NakedStrings.CollidablesLayer);
+        layer |= InspectorStorage.Self().GetLayerInt(Constants.NakedStrings.MapObjectsLayer);
+        layer |= InspectorStorage.Self().GetLayerInt(Constants.NakedStrings.EntitiesLayer);
         
-        inputRaycastsController.Init(gameCamera, InspectorStorage.Self().GetLayerInt(Constants.NakedStrings.CollidablesLayer), OnInputTouchedCallback);
+        inputRaycastsController.Init(gameCamera, layer, OnInputTouchedCallback);
         
         //add the controller to our list for the update
         updateTimedSystems.Add(timeController);
@@ -271,53 +282,53 @@ public class GameplayTestController : MonoBehaviour
             null,
             null,
             OnWorkSmithyDone);
-    }
-
-
-
-    
-    private void ParseMap()
-    {
-
-        var sceneObjects = GameObject.FindObjectsOfType<SuperObject>();
-        if (sceneObjects != null)
-        {
-            for (var i = 0; i < sceneObjects.Length; i++)
-            {
-                //sceneObjects[i].m_Type
-                
-                var customProps = sceneObjects[i].GetComponent<SuperCustomProperties>();
-
-                if (customProps != null)
-                {
-                    foreach (var property in customProps.m_Properties)
-                    {
-
-                        Debug.Log(property.m_Name);
-                        // if (property.m_Name.Equals(somedataobject.PrefabName))
-                        // {
-                        //     name = property.GetValueAsString();
-                        // }
-                    }
-                }
-
-            }
-        }
+        
 
     }
+
     
+
+    
+    #region input raycasts
     
     private void OnInputTouchedCallback(GameObject aGameobject, GameEnums.EventTouchCode anEventCode)
     {
-        if (anEventCode != GameEnums.EventTouchCode.Entity_deselected)
+        DeselectPreviousObject();
+        
+        switch (anEventCode)
         {
-            var mapObjTouched = aGameobject.GetComponentInParent<IMapObjectTouched>();
-            Debug.Log(aGameobject.name);
-            mapObjTouched.IExecute();
+            case GameEnums.EventTouchCode.MapObjects:
+            case GameEnums.EventTouchCode.Collidables:
+            case GameEnums.EventTouchCode.EntitySelected:
+                ExecuteObjectSelected(aGameobject);
+                break;
+            
+            default:
+                break;
         }
     }
+
+    private void DeselectPreviousObject()
+    {
+        if (lastSelectedObject != null)
+        {
+            lastSelectedObject.IDeselect();
+            lastSelectedObject = null;
+        }
+    }
+
+    private void ExecuteObjectSelected(GameObject aGameObject)
+    {
+        var mapObjTouched = aGameObject.GetComponentInParent<IMapObjectTouched>();
+        mapObjTouched.IExecute();
+
+        lastSelectedObject = aGameObject.GetComponentInParent<ISelectableObject>();
+    }
     
+    #endregion
     
+
+
     private void OnWorkDone(uint anEntityId)
     {
         Debug.Log("TEST GAMEPLAYCONTROLLER- OnWorkDone in test for entityId= " + anEntityId);
@@ -356,6 +367,13 @@ public class GameplayTestController : MonoBehaviour
     }
 
    
+
+    
+    
+    
+    
+            
+
 
 
 }

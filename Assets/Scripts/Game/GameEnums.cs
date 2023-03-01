@@ -6,10 +6,10 @@ public class GameEnums
     public enum EventTouchCode
     {
         None,
-        Building,
-        Interactable,
-        Entity_click,
-        Entity_deselected,
+        MapObjects,
+        Collidables,
+        EntitySelected,
+        EntityDeselected,
         Max
     }
     

@@ -18,6 +18,11 @@ namespace EG
         {
             void IExecute();
         }
+        
+        public interface ISelectableObject
+        {
+            void IDeselect();
+        }
 
         public interface IUpdateTimedSystems
         {

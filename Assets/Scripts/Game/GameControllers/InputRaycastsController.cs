@@ -43,31 +43,36 @@ public class InputRaycastsController : IUpdateTimedSystems
         if (!Input.GetMouseButtonUp(0)) return;
         
         if (UICamera.isOverUI) return;
-
-        bool unselect = Input.GetMouseButtonUp(0) ? true : false;
         
         RaycastHit2D hit = Physics2D.Raycast(camera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 500f, layerRaymask);
  
         if(hit.collider != null)
         {
+            if (hit.collider.gameObject.layer == InspectorStorage.Self().GetLayerNumber(Constants.NakedStrings.MapObjectsLayer))
+            {
+                OnEntityClick(hit.collider.gameObject, GameEnums.EventTouchCode.MapObjects);
+                return;
+            }
+            
+            if (hit.collider.gameObject.layer == InspectorStorage.Self().GetLayerNumber(Constants.NakedStrings.EntitiesLayer))
+            {
+                OnEntityClick(hit.collider.gameObject, GameEnums.EventTouchCode.EntitySelected);
+                return;
+            }
+            
             if (hit.collider.gameObject.layer == InspectorStorage.Self().GetLayerNumber(Constants.NakedStrings.CollidablesLayer))
             {
-                if (Input.GetMouseButtonUp(0))
-                {
-                    unselect = false;
-                    OnEntityClick(hit.collider.gameObject, GameEnums.EventTouchCode.Building);
-                    return;
-                }
+                OnEntityClick(hit.collider.gameObject, GameEnums.EventTouchCode.Collidables);
+                return;
             }
         }
         
 
-
-        if (unselect)
+        if (Input.GetMouseButtonUp(0))
         {
             OnClearEntitySelection();
         }
-        
+
     }
 
 
@@ -79,7 +84,7 @@ public class InputRaycastsController : IUpdateTimedSystems
 
     private void OnClearEntitySelection()
     {
-        onResponseInput?.Invoke(null, GameEnums.EventTouchCode.Entity_deselected);
+        onResponseInput?.Invoke(null, GameEnums.EventTouchCode.EntityDeselected);
     }
     
 }
